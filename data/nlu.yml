@@ -1,0 +1,166 @@
+version: "3.1"
+
+nlu:
+- intent: greet
+  examples: |
+    - hey
+    - hello
+    - hi
+    - hello there
+    - good morning
+    - good evening
+    - moin
+    - hey there
+    - let's go
+    - hey dude
+    - goodmorning
+    - goodevening
+    - good afternoon
+
+- intent: goodbye
+  examples: |
+    - cu
+    - good by
+    - cee you later
+    - good night
+    - bye
+    - goodbye
+    - have a nice day
+    - see you around
+    - bye bye
+    - see you later
+
+- intent: affirm
+  examples: |
+    - yes
+    - y
+    - indeed
+    - of course
+    - that sounds good
+    - correct
+
+- intent: deny
+  examples: |
+    - no
+    - n
+    - never
+    - I don't think so
+    - don't like that
+    - no way
+    - not really
+
+- intent: mood_great
+  examples: |
+    - perfect
+    - great
+    - amazing
+    - feeling like a king
+    - wonderful
+    - I am feeling very good
+    - I am great
+    - I am amazing
+    - I am going to save the world
+    - super stoked
+    - extremely good
+    - so so perfect
+    - so good
+    - so perfect
+
+- intent: mood_unhappy
+  examples: |
+    - my day was horrible
+    - I am sad
+    - I don't feel very well
+    - I am disappointed
+    - super sad
+    - I'm so sad
+    - sad
+    - very sad
+    - unhappy
+    - not good
+    - not very good
+    - extremly sad
+    - so saad
+    - so sad
+
+- intent: bot_challenge
+  examples: |
+    - are you a bot?
+    - are you a human?
+    - am I talking to a bot?
+    - am I talking to a human?
+
+- intent: cast_spell
+  examples: |
+    - cast [fireball](spell_type) on [golem](target)
+    - cast [fireball](spell_type) onto the [golem](target)
+    - use [lightning](spell_type) on [dragon](target)
+    - throw [ice shard](spell_type) at [zombie](target)
+    - attack [skeleton](target) with [fireball](spell_type)
+    - [fireball](spell_type) the [goblin](target)
+    - hit [golem](target) with [lightning](spell_type)
+    - cast [heal](spell_type)
+    - use [heal](spell_type) spell
+    - [shield](spell_type) me
+    - cast [shield](spell_type)
+    - [lightning](spell_type) on [dragon](target)
+    - [ice shard](spell_type) at the [zombie](target)
+    - shoot [fireball](spell_type) at [skeleton](target)
+    - blast [golem](target) with [lightning](spell_type)
+    - freeze [dragon](target) with [ice shard](spell_type)
+    - burn the [goblin](target) with [fireball](spell_type)
+    - zap [skeleton](target) with [lightning](spell_type)
+    - cast [fireball](spell_type) at [golem](target)
+    - throw [lightning](spell_type) at [dragon](target)
+    - use [ice shard](spell_type) against [zombie](target)
+
+- intent: check_status
+  examples: |
+    - check status
+    - show status
+    - what's my status
+    - status
+    - show me the enemies
+    - how am I doing
+    - game status
+    - check my health
+    - how much hp do I have
+    - show enemies
+    - what enemies are there
+    - who can I fight
+
+- intent: list_spells
+  examples: |
+    - list spells
+    - show spells
+    - what spells do I have
+    - available spells
+    - spell list
+    - what can I cast
+    - show me my spells
+    - which spells can I use
+    - what spells are available
+
+- intent: reset_game
+  examples: |
+    - reset game
+    - start over
+    - restart
+    - new game
+    - reset
+    - start new game
+    - begin again
+
+- intent: rest
+  examples: |
+    - rest
+    - take a rest
+    - meditate
+    - restore mana
+    - recover mana
+    - I need to rest
+    - let me rest
+    - rest to recover
+    - regenerate mana
+    - recharge
+    - take a break

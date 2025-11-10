@@ -1,0 +1,68 @@
+version: "3.1"
+
+intents:
+  - greet
+  - goodbye
+  - affirm
+  - deny
+  - mood_great
+  - mood_unhappy
+  - bot_challenge
+  - cast_spell
+  - check_status
+  - list_spells
+  - reset_game
+  - rest
+
+entities:
+  - spell_type
+  - target
+
+slots:
+  spell_type:
+    type: text
+    mappings:
+    - type: from_entity
+      entity: spell_type
+  target:
+    type: text
+    mappings:
+    - type: from_entity
+      entity: target
+
+actions:
+  - action_cast_spell
+  - action_check_status
+  - action_list_spells
+  - action_reset_game
+  - action_rest
+
+responses:
+  utter_greet:
+  - text: "🧙 Welcome, Wizard! Ready to battle some enemies? Try saying 'cast fireball on golem' or 'check status'!"
+
+  utter_cheer_up:
+  - text: "Here is something to cheer you up:"
+    image: "https://i.imgur.com/nGF1K8f.jpg"
+
+  utter_did_that_help:
+  - text: "Did that help you?"
+
+  utter_happy:
+  - text: "Great, carry on!"
+
+  utter_goodbye:
+  - text: "🧙 May your spells be ever powerful! Farewell, wizard!"
+
+  utter_iamabot:
+  - text: "I am a bot, powered by Rasa. I help you battle enemies with magic!"
+
+  utter_ask_spell_target:
+  - text: "Which spell do you want to cast, and on which enemy?"
+
+  utter_game_help:
+  - text: "🎮 Available commands:\n- 'cast [spell] on [enemy]'\n- 'check status'\n- 'list spells'\n- 'reset game'"
+
+session_config:
+  session_expiration_time: 60
+  carry_over_slots_to_new_session: true

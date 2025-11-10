@@ -1,0 +1,106 @@
+version: "3.1"
+
+stories:
+
+- story: happy path
+  steps:
+  - intent: greet
+  - action: utter_greet
+  - intent: mood_great
+  - action: utter_happy
+
+- story: sad path 1
+  steps:
+  - intent: greet
+  - action: utter_greet
+  - intent: mood_unhappy
+  - action: utter_cheer_up
+  - action: utter_did_that_help
+  - intent: affirm
+  - action: utter_happy
+
+- story: sad path 2
+  steps:
+  - intent: greet
+  - action: utter_greet
+  - intent: mood_unhappy
+  - action: utter_cheer_up
+  - action: utter_did_that_help
+  - intent: deny
+  - action: utter_goodbye
+
+- story: wizard game start
+  steps:
+  - intent: greet
+  - action: utter_greet
+  - intent: list_spells
+  - action: action_list_spells
+  - intent: cast_spell
+  - action: action_cast_spell
+
+- story: check status then cast spell
+  steps:
+  - intent: check_status
+  - action: action_check_status
+  - intent: cast_spell
+  - action: action_cast_spell
+
+- story: cast multiple spells
+  steps:
+  - intent: cast_spell
+  - action: action_cast_spell
+  - intent: cast_spell
+  - action: action_cast_spell
+  - intent: check_status
+  - action: action_check_status
+
+- story: list spells and cast
+  steps:
+  - intent: list_spells
+  - action: action_list_spells
+  - intent: cast_spell
+  - action: action_cast_spell
+  - intent: cast_spell
+  - action: action_cast_spell
+
+- story: reset game and play
+  steps:
+  - intent: reset_game
+  - action: action_reset_game
+  - intent: cast_spell
+  - action: action_cast_spell
+
+- story: full game flow
+  steps:
+  - intent: greet
+  - action: utter_greet
+  - intent: check_status
+  - action: action_check_status
+  - intent: list_spells
+  - action: action_list_spells
+  - intent: cast_spell
+  - action: action_cast_spell
+  - intent: goodbye
+  - action: utter_goodbye
+
+- story: rest and continue battle
+  steps:
+  - intent: cast_spell
+  - action: action_cast_spell
+  - intent: cast_spell
+  - action: action_cast_spell
+  - intent: rest
+  - action: action_rest
+  - intent: cast_spell
+  - action: action_cast_spell
+
+- story: out of mana scenario
+  steps:
+  - intent: check_status
+  - action: action_check_status
+  - intent: cast_spell
+  - action: action_cast_spell
+  - intent: rest
+  - action: action_rest
+  - intent: check_status
+  - action: action_check_status

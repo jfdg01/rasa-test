@@ -1,0 +1,38 @@
+version: "3.1"
+
+rules:
+
+- rule: Say goodbye anytime the user says goodbye
+  steps:
+  - intent: goodbye
+  - action: utter_goodbye
+
+- rule: Say 'I am a bot' anytime the user challenges
+  steps:
+  - intent: bot_challenge
+  - action: utter_iamabot
+
+- rule: Cast spell when requested
+  steps:
+  - intent: cast_spell
+  - action: action_cast_spell
+
+- rule: Check status when requested
+  steps:
+  - intent: check_status
+  - action: action_check_status
+
+- rule: List spells when requested
+  steps:
+  - intent: list_spells
+  - action: action_list_spells
+
+- rule: Reset game when requested
+  steps:
+  - intent: reset_game
+  - action: action_reset_game
+
+- rule: Rest when requested
+  steps:
+  - intent: rest
+  - action: action_rest
