@@ -31,6 +31,14 @@
             width: 100%;
         }
 
+        .right-panel {
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+            flex: 1;
+            max-width: 580px;
+        }
+
         h1 {
             text-align: center;
             margin-bottom: 20px;
@@ -213,16 +221,13 @@
 
         /* Chat Interface */
         .chat-container {
-            flex: 1;
             background: rgba(255, 255, 255, 0.95);
             border-radius: 20px;
             padding: 20px;
             color: #333;
             display: flex;
             flex-direction: column;
-            min-height: 600px;
-            max-height: 600px;
-            max-width: 580px;
+            height: 400px;
         }
 
         .messages {
@@ -348,6 +353,66 @@
             opacity: 0.6;
             pointer-events: none;
         }
+
+        /* Cheatsheet */
+        .cheatsheet {
+            background: rgba(255, 255, 255, 0.95);
+            border-radius: 20px;
+            padding: 20px;
+            font-size: 12px;
+            color: #333;
+            height: 470px;
+            overflow-y: auto;
+        }
+
+        .cheatsheet h3 {
+            margin: 0 0 10px 0;
+            font-size: 14px;
+            color: #667eea;
+            display: flex;
+            align-items: center;
+            gap: 5px;
+        }
+
+        .cheatsheet-section {
+            margin-bottom: 10px;
+        }
+
+        .cheatsheet-section h4 {
+            margin: 0 0 5px 0;
+            font-size: 12px;
+            font-weight: 600;
+            color: #555;
+        }
+
+        .cheatsheet-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 5px;
+            margin-bottom: 8px;
+        }
+
+        .cheatsheet-item {
+            background: white;
+            padding: 4px 8px;
+            border-radius: 5px;
+            font-size: 11px;
+            border: 1px solid #e0e0e0;
+        }
+
+        .cheatsheet-command {
+            display: block;
+            margin: 2px 0;
+            padding: 3px 6px;
+            background: white;
+            border-radius: 4px;
+            border: 1px solid #e0e0e0;
+            font-size: 11px;
+        }
+
+        .emoji-label {
+            font-weight: 600;
+        }
     </style>
 </head>
 <body>
@@ -388,17 +453,62 @@
             </div>
             </div>
 
-            <!-- Chat Interface -->
-            <div class="chat-container">
-            <div class="messages" id="messages">
-                <div class="message bot-message">
-                    🧙 ¡Bienvenido, Mago! ¿Listo para luchar contra enemigos? Prueba "lanza bola de fuego al golem" o "revisar estado"!
+            <!-- Right Panel: Chat + Cheatsheet -->
+            <div class="right-panel">
+                <!-- Chat Interface -->
+                <div class="chat-container">
+                    <div class="messages" id="messages">
+                        <div class="message bot-message">
+                            🧙 ¡Bienvenido, Mago! ¿Listo para luchar contra enemigos? Prueba "lanza bola de fuego al golem" o "revisar estado"!
+                        </div>
+                    </div>
+                    <div class="input-container">
+                        <input type="text" id="userInput" placeholder="Escribe tu comando aquí..." autocomplete="off">
+                        <button onclick="sendMessage()">Enviar</button>
+                    </div>
                 </div>
-            </div>
-            <div class="input-container">
-                <input type="text" id="userInput" placeholder="Escribe tu comando aquí..." autocomplete="off">
-                <button onclick="sendMessage()">Enviar</button>
-            </div>
+
+                <!-- Cheatsheet -->
+                <div class="cheatsheet">
+                <h3>📖 Cheatsheet</h3>
+                
+                <div class="cheatsheet-section">
+                    <h4>⚔️ Hechizos de Ataque:</h4>
+                    <div class="cheatsheet-grid">
+                        <div class="cheatsheet-item">🔥 <span class="emoji-label">bola de fuego</span></div>
+                        <div class="cheatsheet-item">⚡ <span class="emoji-label">rayo</span></div>
+                        <div class="cheatsheet-item">❄️ <span class="emoji-label">fragmento de hielo</span></div>
+                    </div>
+                </div>
+
+                <div class="cheatsheet-section">
+                    <h4>🛡️ Hechizos de Apoyo:</h4>
+                    <div class="cheatsheet-grid">
+                        <div class="cheatsheet-item">✨ <span class="emoji-label">curar</span></div>
+                        <div class="cheatsheet-item">🛡️ <span class="emoji-label">escudo</span></div>
+                    </div>
+                </div>
+
+                <div class="cheatsheet-section">
+                    <h4>👾 Enemigos:</h4>
+                    <div class="cheatsheet-grid">
+                        <div class="cheatsheet-item">🗿 golem</div>
+                        <div class="cheatsheet-item">🐉 dragón</div>
+                        <div class="cheatsheet-item">🧟 zombi</div>
+                        <div class="cheatsheet-item">💀 esqueleto</div>
+                        <div class="cheatsheet-item">👺 goblin</div>
+                    </div>
+                </div>
+
+                <div class="cheatsheet-section">
+                    <h4>🎮 Comandos Útiles:</h4>
+                    <span class="cheatsheet-command">• <strong>revisar estado</strong> - Ver tu vida y maná</span>
+                    <span class="cheatsheet-command">• <strong>listar hechizos</strong> - Ver hechizos disponibles</span>
+                    <span class="cheatsheet-command">• <strong>descansar</strong> - Recuperar maná</span>
+                    <span class="cheatsheet-command">• <strong>otra vez</strong> - Repetir último hechizo</span>
+                    <span class="cheatsheet-command">• <strong>reiniciar juego</strong> - Empezar de nuevo</span>
+                </div>
+                </div>
             </div>
         </div>
     </div>
