@@ -11,8 +11,9 @@ intents:
   - cast_spell
   - check_status
   - list_spells
-  - reset_game
   - rest
+  - repeat_last_action
+  - reset_game
 
 entities:
   - spell_type
@@ -29,6 +30,18 @@ slots:
     mappings:
     - type: from_entity
       entity: target
+  last_action:
+    type: text
+    mappings:
+    - type: custom
+  last_spell_type:
+    type: text
+    mappings:
+    - type: custom
+  last_target:
+    type: text
+    mappings:
+    - type: custom
 
 actions:
   - action_cast_spell
@@ -36,32 +49,33 @@ actions:
   - action_list_spells
   - action_reset_game
   - action_rest
+  - action_repeat_last
 
 responses:
   utter_greet:
-  - text: "🧙 Welcome, Wizard! Ready to battle some enemies? Try saying 'cast fireball on golem' or 'check status'!"
+  - text: "🧙 ¡Bienvenido, Mago! ¿Listo para luchar contra enemigos? Prueba decir 'lanza bola de fuego al golem' o 'revisar estado'!"
 
   utter_cheer_up:
-  - text: "Here is something to cheer you up:"
+  - text: "Aquí hay algo para animarte:"
     image: "https://i.imgur.com/nGF1K8f.jpg"
 
   utter_did_that_help:
-  - text: "Did that help you?"
+  - text: "¿Te ayudó eso?"
 
   utter_happy:
-  - text: "Great, carry on!"
+  - text: "¡Genial, continúa!"
 
   utter_goodbye:
-  - text: "🧙 May your spells be ever powerful! Farewell, wizard!"
+  - text: "🧙 ¡Que tus hechizos sean siempre poderosos! ¡Adiós, mago!"
 
   utter_iamabot:
-  - text: "I am a bot, powered by Rasa. I help you battle enemies with magic!"
+  - text: "Soy un bot, desarrollado con Rasa. ¡Te ayudo a luchar contra enemigos con magia!"
 
   utter_ask_spell_target:
-  - text: "Which spell do you want to cast, and on which enemy?"
+  - text: "¿Qué hechizo quieres lanzar y a qué enemigo?"
 
   utter_game_help:
-  - text: "🎮 Available commands:\n- 'cast [spell] on [enemy]'\n- 'check status'\n- 'list spells'\n- 'reset game'"
+  - text: "🎮 Comandos disponibles:\n- 'lanza [hechizo] al [enemigo]'\n- 'revisar estado'\n- 'listar hechizos'"
 
 session_config:
   session_expiration_time: 60

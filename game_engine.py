@@ -10,11 +10,11 @@ import random
 
 class SpellType(Enum):
     """Available spells in the game"""
-    FIREBALL = "fireball"
-    LIGHTNING = "lightning"
-    ICE_SHARD = "ice_shard"
-    HEAL = "heal"
-    SHIELD = "shield"
+    FIREBALL = "bola_fuego"
+    LIGHTNING = "rayo"
+    ICE_SHARD = "fragmento_hielo"
+    HEAL = "curar"
+    SHIELD = "escudo"
 
 
 class Enemy:
@@ -31,8 +31,8 @@ class Enemy:
         if self.hp <= 0:
             self.hp = 0
             self.is_alive = False
-            return f"{self.name} has been defeated! 💀"
-        return f"{self.name} takes {damage} damage! HP: {self.hp}/{self.max_hp}"
+            return f"¡{self.name} ha sido derrotado! 💀"
+        return f"¡{self.name} recibe {damage} de daño! Vida: {self.hp}/{self.max_hp}"
 
 
 class WizardGame:
@@ -44,6 +44,8 @@ class WizardGame:
         self.mana = 50
         self.max_mana = 50
         self.enemies: Dict[str, Enemy] = {}
+        self.shield_active = False
+        self.game_over = False
         self.initialize_enemies()
         
         # Spell damage values
@@ -65,10 +67,10 @@ class WizardGame:
     def initialize_enemies(self):
         """Create initial enemies"""
         self.enemies = {
-            "golem": Enemy("Stone Golem", 80, "lightning"),
-            "dragon": Enemy("Fire Dragon", 120, "ice_shard"),
-            "zombie": Enemy("Zombie", 50, "fireball"),
-            "skeleton": Enemy("Skeleton Warrior", 60),
+            "golem": Enemy("Golem de Piedra", 80, "rayo"),
+            "dragon": Enemy("Dragón de Fuego", 120, "fragmento_hielo"),
+            "zombie": Enemy("Zombi", 50, "bola_fuego"),
+            "esqueleto": Enemy("Guerrero Esqueleto", 60),
             "goblin": Enemy("Goblin", 40),
         }
     
@@ -82,19 +84,56 @@ class WizardGame:
         Main spell casting function
         Returns a message describing what happened
         """
+        # Check if game is over
+        if self.game_over:
+            return "💀 El juego ha terminado. Usa 'reiniciar juego' para volver a jugar."
+        
         spell_name = spell_name.lower().replace(" ", "_")
         target_name = target_name.lower().strip()
+        
+        # Map English and Spanish spell names to internal names
+        spell_mappings = {
+            "fireball": "bola_fuego",
+            "lightning": "rayo",
+            "ice_shard": "fragmento_hielo",
+            "ice": "fragmento_hielo",
+            "heal": "curar",
+            "shield": "escudo",
+            "fragmento_de_hielo": "fragmento_hielo",
+            "bola_de_fuego": "bola_fuego",
+            "hielo": "fragmento_hielo",
+            "fuego": "bola_fuego",
+            "fragmento": "fragmento_hielo",
+            "cúrame": "curar",
+            "curame": "curar",
+            "protégeme": "escudo",
+            "protegeme": "escudo",
+            "congelar": "fragmento_hielo",
+            "quemar": "bola_fuego",
+            "electrocutar": "rayo"
+        }
+        
+        # Map target names
+        target_mappings = {
+            "dragon": "dragon",
+            "dragón": "dragon",
+            "skeleton": "esqueleto",
+            "zombi": "zombie"
+        }
+        
+        spell_name = spell_mappings.get(spell_name, spell_name)
+        target_name = target_mappings.get(target_name, target_name)
         
         # Check if spell exists
         try:
             spell = SpellType(spell_name)
         except ValueError:
-            return f"❌ Unknown spell: {spell_name}. Available spells: fireball, lightning, ice_shard, heal, shield"
+            return f"❌ Hechizo desconocido: {spell_name}. Hechizos disponibles: bola_fuego, rayo, fragmento_hielo, curar, escudo"
         
         # Check mana
         cost = self.spell_costs.get(spell, 10)
         if self.mana < cost:
-            return f"❌ Not enough mana! You need {cost} mana, but only have {self.mana}."
+            return f"❌ ¡No tienes suficiente maná! Necesitas {cost} de maná, pero solo tienes {self.mana}."
         
         # Deduct mana
         self.mana -= cost
@@ -105,20 +144,28 @@ class WizardGame:
             old_hp = self.player_hp
             self.player_hp = min(self.player_hp + heal_amount, self.player_max_hp)
             healed = self.player_hp - old_hp
-            return f"✨ You cast Heal! Restored {healed} HP. HP: {self.player_hp}/{self.player_max_hp}"
+            message = f"✨ ¡Lanzas Curar! Restaurado {healed} de vida. Vida: {self.player_hp}/{self.player_max_hp}<br>Maná: {self.mana}/{self.max_mana}"
+            
+            # Enemy counterattack
+            enemy_attack = self.enemy_turn()
+            if enemy_attack:
+                message += "<br><br>" + enemy_attack
+            
+            return message
         
         # Handle shield spell
         if spell == SpellType.SHIELD:
-            return f"🛡️ You cast Shield! You are protected for the next attack."
+            self.shield_active = True
+            return f"🛡️ ¡Lanzas Escudo! Estás protegido para el próximo ataque.<br>Maná: {self.mana}/{self.max_mana}"
         
         # Handle attack spells
         enemy = self.get_enemy(target_name)
         if not enemy:
             available = ", ".join([e for e in self.enemies.keys() if self.enemies[e].is_alive])
-            return f"❌ Target '{target_name}' not found. Available enemies: {available}"
+            return f"❌ Objetivo '{target_name}' no encontrado. Enemigos disponibles: {available}"
         
         if not enemy.is_alive:
-            return f"❌ {enemy.name} is already defeated!"
+            return f"❌ ¡{enemy.name} ya fue derrotado!"
         
         # Calculate damage
         base_damage = self.spell_damage.get(spell, 15)
@@ -126,7 +173,7 @@ class WizardGame:
         # Apply weakness bonus
         if enemy.element_weakness == spell.value:
             base_damage = int(base_damage * 1.5)
-            weakness_msg = " 💥 CRITICAL HIT! Exploited weakness!"
+            weakness_msg = " 💥 ¡GOLPE CRÍTICO! ¡Explotaste su debilidad!"
         else:
             weakness_msg = ""
         
@@ -136,40 +183,80 @@ class WizardGame:
         # Deal damage
         result = enemy.take_damage(damage)
         
-        spell_emoji = {"fireball": "🔥", "lightning": "⚡", "ice_shard": "❄️"}.get(spell.value, "✨")
+        spell_emoji = {"bola_fuego": "🔥", "rayo": "⚡", "fragmento_hielo": "❄️"}.get(spell.value, "✨")
+        spell_display = {"bola_fuego": "Bola de Fuego", "rayo": "Rayo", "fragmento_hielo": "Fragmento de Hielo"}.get(spell.value, spell.value.replace('_', ' ').title())
         
-        return f"{spell_emoji} You cast {spell.value.replace('_', ' ').title()} on {enemy.name}!{weakness_msg}\n{result}\nMana: {self.mana}/{self.max_mana}"
+        message = f"{spell_emoji} ¡Lanzas {spell_display} a {enemy.name}!{weakness_msg}<br>{result}<br>Maná: {self.mana}/{self.max_mana}"
+        
+        # Enemy counterattack if still alive
+        if enemy.is_alive:
+            enemy_attack = self.enemy_turn()
+            message += "<br><br>" + enemy_attack
+        
+        return message
+    
+    def enemy_turn(self) -> str:
+        """Enemy attacks the player"""
+        alive_enemies = [e for e in self.enemies.values() if e.is_alive]
+        
+        if not alive_enemies:
+            return ""
+        
+        # Random enemy attacks
+        attacker = random.choice(alive_enemies)
+        damage = random.randint(10, 20)
+        
+        # Check shield
+        if self.shield_active:
+            self.shield_active = False
+            return f"🛡️ ¡{attacker.name} ataca pero tu escudo lo bloquea! (0 daño)"
+        
+        # Apply damage
+        self.player_hp -= damage
+        
+        if self.player_hp <= 0:
+            self.player_hp = 0
+            self.game_over = True
+            return f"⚔️ ¡{attacker.name} te ataca! Recibes {damage} de daño.<br>💀 <strong>¡HAS SIDO DERROTADO! Usa 'reiniciar juego' para volver a jugar.</strong>"
+        
+        return f"⚔️ ¡{attacker.name} te ataca! Recibes {damage} de daño. Tu Vida: {self.player_hp}/{self.player_max_hp}"
     
     def get_status(self) -> str:
         """Get current game status"""
         alive_enemies = [e for e in self.enemies.values() if e.is_alive]
         dead_enemies = [e for e in self.enemies.values() if not e.is_alive]
         
-        status = f"🧙 **Your Status:**\n"
-        status += f"  HP: {self.player_hp}/{self.player_max_hp} | Mana: {self.mana}/{self.max_mana}\n\n"
+        status = f"🧙 <strong>Tu Estado:</strong><br>"
+        status += f"&nbsp;&nbsp;Vida: {self.player_hp}/{self.player_max_hp} | Maná: {self.mana}/{self.max_mana}<br>"
+        if self.shield_active:
+            status += f"&nbsp;&nbsp;🛡️ Escudo activo<br>"
+        status += "<br>"
         
         if alive_enemies:
-            status += "⚔️ **Enemies:**\n"
+            status += "⚔️ <strong>Enemigos:</strong><br>"
             for enemy in alive_enemies:
-                weakness = f" (Weak to {enemy.element_weakness})" if enemy.element_weakness else ""
-                status += f"  • {enemy.name}: {enemy.hp}/{enemy.max_hp} HP{weakness}\n"
+                weakness = f" (Débil a {enemy.element_weakness})" if enemy.element_weakness else ""
+                status += f"&nbsp;&nbsp;• {enemy.name}: {enemy.hp}/{enemy.max_hp} Vida{weakness}<br>"
         
         if dead_enemies:
-            status += f"\n💀 **Defeated:** {', '.join([e.name for e in dead_enemies])}\n"
+            status += f"<br>💀 <strong>Derrotados:</strong> {', '.join([e.name for e in dead_enemies])}<br>"
         
         if not alive_enemies:
-            status += "\n🎉 **Victory! All enemies defeated!**"
+            status += "<br>🎉 <strong>¡Victoria! ¡Todos los enemigos derrotados!</strong>"
+        
+        if self.game_over:
+            status += "<br><br>💀 <strong>JUEGO TERMINADO</strong> - Usa 'reiniciar juego' para volver a jugar."
         
         return status
     
     def list_spells(self) -> str:
         """List available spells"""
-        spells = "📜 **Available Spells:**\n"
-        spells += "  • Fireball (15 mana) - 30 damage 🔥\n"
-        spells += "  • Lightning (12 mana) - 25 damage ⚡\n"
-        spells += "  • Ice Shard (10 mana) - 20 damage ❄️\n"
-        spells += "  • Heal (20 mana) - Restore 30 HP ✨\n"
-        spells += "  • Shield (15 mana) - Block next attack 🛡️\n"
+        spells = "📜 <strong>Hechizos Disponibles:</strong><br>"
+        spells += "&nbsp;&nbsp;• Bola de Fuego (15 maná) - 30 de daño 🔥<br>"
+        spells += "&nbsp;&nbsp;• Rayo (12 maná) - 25 de daño ⚡<br>"
+        spells += "&nbsp;&nbsp;• Fragmento de Hielo (10 maná) - 20 de daño ❄️<br>"
+        spells += "&nbsp;&nbsp;• Curar (20 maná) - Restaura 30 de vida ✨<br>"
+        spells += "&nbsp;&nbsp;• Escudo (15 maná) - Bloquea el próximo ataque 🛡️<br>"
         return spells
 
 
@@ -199,20 +286,28 @@ def reset_game() -> str:
     """Reset the game"""
     global game
     game = WizardGame()
-    return "🎮 Game reset! A new adventure begins!"
+    return "🎮 ¡Juego reiniciado! ¡Una nueva aventura comienza!"
 
 
 def rest() -> str:
     """
     Rest to restore mana
     """
+    # Check if game is over
+    if game.game_over:
+        return "💀 El juego ha terminado. Usa 'reiniciar juego' para volver a jugar."
+    
     mana_restored = min(25, game.max_mana - game.mana)
     game.mana = min(game.mana + 25, game.max_mana)
     
-    if mana_restored > 0:
-        return f"🧘 You take a moment to rest and meditate...\n✨ Restored {mana_restored} mana! Mana: {game.mana}/{game.max_mana}\n\n⚠️ Warning: Enemies may attack while you rest!"
-    else:
-        return f"🧘 You rest, but your mana is already full! Mana: {game.mana}/{game.max_mana}"
+    message = f"🧘 Te tomas un momento para descansar y meditar...<br>✨ ¡Restaurado {mana_restored} de maná! Maná: {game.mana}/{game.max_mana}"
+    
+    # Enemy attacks while resting
+    enemy_attack = game.enemy_turn()
+    if enemy_attack:
+        message += "<br><br>⚠️ ¡Los enemigos aprovechan tu descanso!<br>" + enemy_attack
+    
+    return message
 
 
 # Example usage
@@ -224,11 +319,11 @@ if __name__ == "__main__":
     if sys.platform == 'win32':
         sys.stdout = io.TextIOWrapper(sys.stdout.buffer, encoding='utf-8')
     
-    print("=== Wizard Game Demo ===")
+    print("=== Demo del Juego del Mago ===")
     print(get_game_status())
     print("\n" + list_spells())
-    print("\n--- Casting Spells ---")
-    print(cast_spell("fireball", "golem"))
-    print(cast_spell("lightning", "golem"))
+    print("\n--- Lanzando Hechizos ---")
+    print(cast_spell("bola_fuego", "golem"))
+    print(cast_spell("rayo", "golem"))
     print("\n" + get_game_status())
 

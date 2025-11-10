@@ -3,164 +3,312 @@ version: "3.1"
 nlu:
 - intent: greet
   examples: |
+    - hola
+    - buenos días
+    - buenas tardes
+    - buenas noches
+    - hola qué tal
     - hey
-    - hello
-    - hi
-    - hello there
-    - good morning
-    - good evening
-    - moin
-    - hey there
-    - let's go
-    - hey dude
-    - goodmorning
-    - goodevening
-    - good afternoon
+    - saludos
+    - qué onda
+    - buenas
+    - cómo estás
+    - qué tal
 
 - intent: goodbye
   examples: |
-    - cu
-    - good by
-    - cee you later
-    - good night
+    - adiós
+    - hasta luego
+    - nos vemos
+    - chao
+    - hasta pronto
+    - me voy
+    - hasta la próxima
+    - que tengas un buen día
     - bye
-    - goodbye
-    - have a nice day
-    - see you around
-    - bye bye
-    - see you later
+    - hasta mañana
 
 - intent: affirm
   examples: |
-    - yes
-    - y
-    - indeed
-    - of course
-    - that sounds good
-    - correct
+    - sí
+    - si
+    - claro
+    - por supuesto
+    - correcto
+    - exacto
+    - afirmativo
+    - vale
+    - ok
+    - está bien
 
 - intent: deny
   examples: |
     - no
-    - n
-    - never
-    - I don't think so
-    - don't like that
-    - no way
-    - not really
+    - nunca
+    - no creo
+    - no me gusta
+    - de ninguna manera
+    - para nada
+    - negativo
 
 - intent: mood_great
   examples: |
-    - perfect
-    - great
-    - amazing
-    - feeling like a king
-    - wonderful
-    - I am feeling very good
-    - I am great
-    - I am amazing
-    - I am going to save the world
-    - super stoked
-    - extremely good
-    - so so perfect
-    - so good
-    - so perfect
+    - perfecto
+    - genial
+    - increíble
+    - me siento como un rey
+    - maravilloso
+    - me siento muy bien
+    - estoy genial
+    - estoy increíble
+    - voy a salvar el mundo
+    - súper emocionado
+    - extremadamente bien
+    - tan perfecto
+    - muy bien
+    - excelente
 
 - intent: mood_unhappy
   examples: |
-    - my day was horrible
-    - I am sad
-    - I don't feel very well
-    - I am disappointed
-    - super sad
-    - I'm so sad
-    - sad
-    - very sad
-    - unhappy
-    - not good
-    - not very good
-    - extremly sad
-    - so saad
-    - so sad
+    - mi día fue horrible
+    - estoy triste
+    - no me siento muy bien
+    - estoy decepcionado
+    - súper triste
+    - estoy tan triste
+    - triste
+    - muy triste
+    - infeliz
+    - no está bien
+    - no muy bien
+    - extremadamente triste
+    - tan triste
 
 - intent: bot_challenge
   examples: |
-    - are you a bot?
-    - are you a human?
-    - am I talking to a bot?
-    - am I talking to a human?
+    - eres un bot?
+    - eres un humano?
+    - estoy hablando con un bot?
+    - estoy hablando con un humano?
+    - eres una máquina?
+    - qué eres?
 
 - intent: cast_spell
   examples: |
-    - cast [fireball](spell_type) on [golem](target)
-    - cast [fireball](spell_type) onto the [golem](target)
-    - use [lightning](spell_type) on [dragon](target)
-    - throw [ice shard](spell_type) at [zombie](target)
-    - attack [skeleton](target) with [fireball](spell_type)
-    - [fireball](spell_type) the [goblin](target)
-    - hit [golem](target) with [lightning](spell_type)
-    - cast [heal](spell_type)
-    - use [heal](spell_type) spell
-    - [shield](spell_type) me
-    - cast [shield](spell_type)
-    - [lightning](spell_type) on [dragon](target)
-    - [ice shard](spell_type) at the [zombie](target)
-    - shoot [fireball](spell_type) at [skeleton](target)
-    - blast [golem](target) with [lightning](spell_type)
-    - freeze [dragon](target) with [ice shard](spell_type)
-    - burn the [goblin](target) with [fireball](spell_type)
-    - zap [skeleton](target) with [lightning](spell_type)
-    - cast [fireball](spell_type) at [golem](target)
-    - throw [lightning](spell_type) at [dragon](target)
-    - use [ice shard](spell_type) against [zombie](target)
+    - lanza [bola de fuego](spell_type) al [golem](target)
+    - lanza [bola de fuego](spell_type) sobre el [golem](target)
+    - usa [rayo](spell_type) en el [dragón](target)
+    - lanza [fragmento de hielo](spell_type) al [zombi](target)
+    - ataca al [esqueleto](target) con [bola de fuego](spell_type)
+    - [bola de fuego](spell_type) al [goblin](target)
+    - golpea al [golem](target) con [rayo](spell_type)
+    - lanza [curar](spell_type)
+    - usa el hechizo [curar](spell_type)
+    - [escudo](spell_type)
+    - lanza [escudo](spell_type)
+    - [rayo](spell_type) al [dragón](target)
+    - [fragmento de hielo](spell_type) al [zombi](target)
+    - dispara [bola de fuego](spell_type) al [esqueleto](target)
+    - ataca al [golem](target) con [rayo](spell_type)
+    - congela al [dragón](target) con [fragmento de hielo](spell_type)
+    - quema al [goblin](target) con [bola de fuego](spell_type)
+    - electrocuta al [esqueleto](target) con [rayo](spell_type)
+    - lanza [bola de fuego](spell_type) sobre el [golem](target)
+    - lanza [rayo](spell_type) al [dragón](target)
+    - usa [fragmento de hielo](spell_type) contra el [zombi](target)
+    - lanza [bola_fuego](spell_type) al [golem](target)
+    - usa [rayo](spell_type) en [dragon](target)
+    - [fragmento_hielo](spell_type) al [zombie](target)
+    - ataca [esqueleto](target) con [bola_fuego](spell_type)
+    - [bola_fuego](spell_type) al [goblin](target)
+    - usa [curar](spell_type)
+    - casteo [escudo](spell_type)
+    - [hielo](spell_type) al [goblin](target)
+    - [fuego](spell_type) al [golem](target)
+    - [fragmento](spell_type) al [dragón](target)
+    - lanza [hielo](spell_type) al [zombi](target)
+    - [fuego](spell_type) al [esqueleto](target)
+    - usa [hielo](spell_type) en el [golem](target)
+    - ahora al [zombi](target)
+    - ahora al [golem](target)
+    - ahora al [dragón](target)
+    - también al [esqueleto](target)
+    - también al [goblin](target)
+    - al [golem](target)
+    - al [dragón](target)
+    - al [zombi](target)
+    - tira [fuego](spell_type) al [golem](target)
+    - dame [escudo](spell_type)
+    - ponme [escudo](spell_type)
+    - necesito [curar](spell_type)
+    - quiero [curar](spell_type)
+    - atacar [golem](target) con [rayo](spell_type)
+    - matar al [zombi](target) con [fuego](spell_type)
+    - destruir al [dragón](target) con [hielo](spell_type)
+    - castea [rayo](spell_type) al [esqueleto](target)
+    - lanzar [bola de fuego](spell_type) contra [goblin](target)
+    - utiliza [fragmento de hielo](spell_type) en [dragon](target)
+    - pégale al [golem](target) con [rayo](spell_type)
+    - dale [fuego](spell_type) al [zombi](target)
+    - congelar [dragon](target)
+    - quemar [zombie](target)
+    - electrocutar [esqueleto](target)
+    - [rayo](spell_type) contra [golem](target)
+    - [hielo](spell_type) contra [dragon](target)
+    - ataque de [fuego](spell_type) a [goblin](target)
+    - hechizo de [rayo](spell_type) al [esqueleto](target)
+    - lanza magia de [hielo](spell_type) al [zombi](target)
+    - aplicar [escudo](spell_type)
+    - activar [escudo](spell_type)
+    - usar poder de [curar](spell_type)
+    - lanzame [curar](spell_type)
+    - cúrame
+    - protégeme
+    - [bola_de_fuego](spell_type) a [golem](target)
+    - [fragmento_de_hielo](spell_type) a [dragon](target)
+    - quiero atacar al [zombi](target) con [fuego](spell_type)
+    - voy a lanzar [rayo](spell_type) al [esqueleto](target)
+    - disparo [hielo](spell_type) al [goblin](target)
+    - lanzo [fuego](spell_type) contra el [golem](target)
+    - tirá [rayo](spell_type) al [dragon](target)
+    - echale [hielo](spell_type) al [zombie](target)
+    - mándale [fuego](spell_type) al [esqueleto](target)
+    - otro [fuego](spell_type) al [golem](target)
+    - más [rayo](spell_type) al [dragón](target)
 
 - intent: check_status
   examples: |
-    - check status
-    - show status
-    - what's my status
+    - revisar estado
+    - mostrar estado
+    - cuál es mi estado
+    - estado
+    - muéstrame los enemigos
+    - cómo estoy
+    - estado del juego
+    - revisar mi vida
+    - cuánta vida tengo
+    - mostrar enemigos
+    - qué enemigos hay
+    - contra quién puedo luchar
+    - chequear estado
+    - ver estado
     - status
-    - show me the enemies
-    - how am I doing
-    - game status
-    - check my health
-    - how much hp do I have
-    - show enemies
-    - what enemies are there
-    - who can I fight
+    - mi estado
+    - cómo va el juego
+    - ver mi vida
+    - cuánto maná tengo
+    - mi vida
+    - mis stats
+    - estadísticas
+    - ver stats
+    - info
+    - información del juego
+    - dame mi estado
+    - muéstrame mi vida
+    - mostrar vida y maná
+    - quiero ver mi estado
+    - estado actual
+    - situación actual
 
 - intent: list_spells
   examples: |
-    - list spells
-    - show spells
-    - what spells do I have
-    - available spells
-    - spell list
-    - what can I cast
-    - show me my spells
-    - which spells can I use
-    - what spells are available
+    - listar hechizos
+    - mostrar hechizos
+    - qué hechizos tengo
+    - hechizos disponibles
+    - lista de hechizos
+    - qué puedo lanzar
+    - muéstrame mis hechizos
+    - qué hechizos puedo usar
+    - qué hechizos están disponibles
+    - ver hechizos
+    - mostrar mis hechizos
+    - hechizos
+    - spells
+    - mis hechizos
+    - ver lista de hechizos
+    - dame la lista de hechizos
+    - cuáles son mis hechizos
+    - qué magia tengo
+    - ver magia disponible
+    - mostrar poderes
+    - mis poderes
+    - lista de magias
+    - qué ataques tengo
+    - ver ataques disponibles
 
 - intent: reset_game
   examples: |
-    - reset game
-    - start over
-    - restart
-    - new game
+    - reiniciar juego
+    - empezar de nuevo
+    - reiniciar
+    - nuevo juego
+    - resetear
+    - empezar nuevo juego
+    - comenzar otra vez
     - reset
-    - start new game
-    - begin again
+    - reiniciar el juego
+    - reset el juego
+    - resetea el juego
+    - volver a empezar
+    - comenzar de cero
+    - restart
+    - empezar juego nuevo
 
 - intent: rest
   examples: |
+    - descansar
+    - tomar un descanso
+    - meditar
+    - restaurar maná
+    - recuperar maná
+    - necesito descansar
+    - déjame descansar
+    - descansar para recuperar
+    - regenerar maná
+    - recargar
+    - tomar un respiro
+    - descanso
     - rest
-    - take a rest
-    - meditate
-    - restore mana
-    - recover mana
-    - I need to rest
-    - let me rest
-    - rest to recover
-    - regenerate mana
-    - recharge
-    - take a break
+    - quiero descansar
+    - voy a descansar
+    - me voy a descansar
+    - necesito maná
+    - sin maná
+    - no tengo maná
+    - recuperar energía
+    - recargar maná
+    - regenerar
+    - meditar un poco
+    - pausa para descansar
+    - tomar descanso
+
+- intent: repeat_last_action
+  examples: |
+    - otra vez
+    - hazlo de nuevo
+    - repetir
+    - lo mismo
+    - una vez más
+    - repite eso
+    - hazlo otra vez
+    - repetir última acción
+    - lo mismo otra vez
+    - repetir el último
+    - una más
+    - hacer lo mismo
+    - de nuevo
+    - nuevamente
+    - again
+    - repeat
+    - otra
+    - otra más
+    - igual
+    - lo mismo de antes
+    - repetir eso
+    - repite
+    - mismo ataque
+    - mismo hechizo
+    - otra vez lo mismo
+    - hacer de nuevo
+    - vuelve a hacerlo

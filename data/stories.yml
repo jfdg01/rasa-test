@@ -63,13 +63,6 @@ stories:
   - intent: cast_spell
   - action: action_cast_spell
 
-- story: reset game and play
-  steps:
-  - intent: reset_game
-  - action: action_reset_game
-  - intent: cast_spell
-  - action: action_cast_spell
-
 - story: full game flow
   steps:
   - intent: greet
@@ -104,3 +97,19 @@ stories:
   - action: action_rest
   - intent: check_status
   - action: action_check_status
+
+- story: cast spell and repeat
+  steps:
+  - intent: cast_spell
+  - action: action_cast_spell
+  - intent: repeat_last_action
+  - action: action_repeat_last
+
+- story: multiple repeats
+  steps:
+  - intent: cast_spell
+  - action: action_cast_spell
+  - intent: repeat_last_action
+  - action: action_repeat_last
+  - intent: repeat_last_action
+  - action: action_repeat_last

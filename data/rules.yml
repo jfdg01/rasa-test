@@ -27,12 +27,17 @@ rules:
   - intent: list_spells
   - action: action_list_spells
 
-- rule: Reset game when requested
-  steps:
-  - intent: reset_game
-  - action: action_reset_game
-
 - rule: Rest when requested
   steps:
   - intent: rest
   - action: action_rest
+
+- rule: Repeat last action when requested
+  steps:
+  - intent: repeat_last_action
+  - action: action_repeat_last
+
+- rule: Reset game when requested
+  steps:
+  - intent: reset_game
+  - action: action_reset_game

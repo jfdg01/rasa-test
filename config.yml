@@ -8,7 +8,7 @@ assistant_id: 20251110-122139-round-dolcetto
 
 # Configuration for Rasa NLU.
 # https://rasa.com/docs/rasa/nlu/components/
-language: en
+language: es
 
 pipeline:
 - name: WhitespaceTokenizer
@@ -41,5 +41,5 @@ policies:
   epochs: 100
 - name: TEDPolicy
   max_history: 5
-  epochs: 100
+  epochs: 150
   constrain_similarities: true

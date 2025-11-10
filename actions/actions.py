@@ -14,7 +14,7 @@ import os
 # Add the parent directory to the path so we can import game_engine
 sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
-from game_engine import cast_spell, get_game_status, list_spells, reset_game, rest
+from game_engine import cast_spell, get_game_status, list_spells, rest, reset_game
 
 
 class ActionCastSpell(Action):
@@ -33,14 +33,14 @@ class ActionCastSpell(Action):
 
         # If spell type is not provided, ask for it
         if not spell_type:
-            dispatcher.utter_message(text="❓ Which spell do you want to cast? (fireball, lightning, ice_shard, heal, shield)")
+            dispatcher.utter_message(text="❓ ¿Qué hechizo quieres lanzar? (bola_fuego, rayo, fragmento_hielo, curar, escudo)")
             return []
 
         # For healing and shield spells, target is optional
-        if spell_type.lower() in ["heal", "shield"]:
+        if spell_type.lower() in ["curar", "escudo", "heal", "shield"]:
             target = target or "self"
         elif not target:
-            dispatcher.utter_message(text="❓ Which enemy do you want to target? (golem, dragon, zombie, skeleton, goblin)")
+            dispatcher.utter_message(text="❓ ¿A qué enemigo quieres atacar? (golem, dragon, zombie, esqueleto, goblin)")
             return []
 
         # Call the game engine's cast_spell function
@@ -49,8 +49,14 @@ class ActionCastSpell(Action):
         # Send the result back to the user
         dispatcher.utter_message(text=result)
 
-        # Clear the slots for the next spell
-        return [SlotSet("spell_type", None), SlotSet("target", None)]
+        # Save this action for repeat functionality
+        return [
+            SlotSet("spell_type", None), 
+            SlotSet("target", None),
+            SlotSet("last_action", "cast_spell"),
+            SlotSet("last_spell_type", spell_type),
+            SlotSet("last_target", target)
+        ]
 
 
 class ActionCheckStatus(Action):
@@ -69,7 +75,12 @@ class ActionCheckStatus(Action):
         # Send the status to the user
         dispatcher.utter_message(text=status)
 
-        return []
+        # Save this action for repeat functionality
+        return [
+            SlotSet("last_action", "check_status"),
+            SlotSet("last_spell_type", None),
+            SlotSet("last_target", None)
+        ]
 
 
 class ActionListSpells(Action):
@@ -88,30 +99,12 @@ class ActionListSpells(Action):
         # Send the spell list to the user
         dispatcher.utter_message(text=spells)
 
-        return []
-
-
-class ActionResetGame(Action):
-    """Custom action to reset the game"""
-
-    def name(self) -> Text:
-        return "action_reset_game"
-
-    def run(self, dispatcher: CollectingDispatcher,
-            tracker: Tracker,
-            domain: Dict[Text, Any]) -> List[Dict[Text, Any]]:
-
-        # Reset the game
-        result = reset_game()
-        
-        # Send confirmation to the user
-        dispatcher.utter_message(text=result)
-        
-        # Also show the initial status
-        status = get_game_status()
-        dispatcher.utter_message(text=status)
-
-        return []
+        # Save this action for repeat functionality
+        return [
+            SlotSet("last_action", "list_spells"),
+            SlotSet("last_spell_type", None),
+            SlotSet("last_target", None)
+        ]
 
 
 class ActionRest(Action):
@@ -129,5 +122,88 @@ class ActionRest(Action):
         
         # Send the result to the user
         dispatcher.utter_message(text=result)
+
+        # Save this action for repeat functionality
+        return [
+            SlotSet("last_action", "rest"),
+            SlotSet("last_spell_type", None),
+            SlotSet("last_target", None)
+        ]
+
+
+class ActionRepeatLast(Action):
+    """Custom action to repeat the last action"""
+
+    def name(self) -> Text:
+        return "action_repeat_last"
+
+    def run(self, dispatcher: CollectingDispatcher,
+            tracker: Tracker,
+            domain: Dict[Text, Any]) -> List[Dict[Text, Any]]:
+
+        # Get the last action from slots
+        last_action = tracker.get_slot("last_action")
+        
+        if not last_action:
+            dispatcher.utter_message(text="❓ No hay acción previa para repetir. ¡Intenta lanzar un hechizo primero!")
+            return []
+        
+        # Repeat based on the last action type
+        if last_action == "cast_spell":
+            last_spell = tracker.get_slot("last_spell_type")
+            last_target = tracker.get_slot("last_target")
+            
+            if last_spell:
+                result = cast_spell(last_spell, last_target)
+                dispatcher.utter_message(text=f"🔁 Repitiendo: lanzando {last_spell} a {last_target}<br><br>{result}")
+                
+                # Keep the same last_action slots
+                return [
+                    SlotSet("last_action", "cast_spell"),
+                    SlotSet("last_spell_type", last_spell),
+                    SlotSet("last_target", last_target)
+                ]
+        
+        elif last_action == "rest":
+            result = rest()
+            dispatcher.utter_message(text=f"🔁 Repitiendo: descansando<br><br>{result}")
+            return [SlotSet("last_action", "rest")]
+        
+        elif last_action == "check_status":
+            status = get_game_status()
+            dispatcher.utter_message(text=f"🔁 Repitiendo: revisando estado<br><br>{status}")
+            return [SlotSet("last_action", "check_status")]
+        
+        elif last_action == "list_spells":
+            spells = list_spells()
+            dispatcher.utter_message(text=f"🔁 Repitiendo: listando hechizos<br><br>{spells}")
+            return [SlotSet("last_action", "list_spells")]
+        
+        else:
+            dispatcher.utter_message(text="❓ No se puede repetir esa acción.")
+            return []
+
+
+class ActionResetGame(Action):
+    """Custom action to reset the game"""
+
+    def name(self) -> Text:
+        return "action_reset_game"
+
+    def run(self, dispatcher: CollectingDispatcher,
+            tracker: Tracker,
+            domain: Dict[Text, Any]) -> List[Dict[Text, Any]]:
+
+        # Reset the game
+        result = reset_game()
+        
+        # Send confirmation to the user with a special metadata for UI reset
+        dispatcher.utter_message(
+            text=result + "<br><br>🔄 La conversación se ha reiniciado."
+        )
+        
+        # Also show the initial status
+        status = get_game_status()
+        dispatcher.utter_message(text=status)
 
         return []

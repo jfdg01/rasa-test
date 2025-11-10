@@ -1,0 +1,655 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>🧙 Juego de Batalla de Magos</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            color: #fff;
+        }
+
+        .game-container {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            padding: 20px;
+            max-width: 800px;
+            margin: 0 auto;
+            width: 100%;
+        }
+
+        h1 {
+            text-align: center;
+            margin-bottom: 20px;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.5);
+        }
+
+        .battle-arena {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 20px;
+            padding: 30px;
+            backdrop-filter: blur(10px);
+            margin-bottom: 20px;
+            min-height: 400px;
+        }
+
+        /* Wizard (Left Side) */
+        .wizard-section {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        .wizard-sprite {
+            width: 150px;
+            height: 150px;
+            font-size: 120px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: radial-gradient(circle, rgba(255,255,255,0.2), transparent);
+            border-radius: 50%;
+            margin-bottom: 20px;
+            animation: float 3s ease-in-out infinite;
+        }
+
+        @keyframes float {
+            0%, 100% { transform: translateY(0px); }
+            50% { transform: translateY(-10px); }
+        }
+
+        .wizard-info {
+            text-align: center;
+            width: 100%;
+            max-width: 250px;
+        }
+
+        .wizard-name {
+            font-size: 24px;
+            font-weight: bold;
+            margin-bottom: 15px;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.5);
+        }
+
+        .stat-bar {
+            margin-bottom: 10px;
+        }
+
+        .stat-label {
+            display: flex;
+            justify-content: space-between;
+            font-size: 14px;
+            margin-bottom: 5px;
+        }
+
+        .bar {
+            height: 25px;
+            background: rgba(0,0,0,0.3);
+            border-radius: 12px;
+            overflow: hidden;
+            border: 2px solid rgba(255,255,255,0.3);
+        }
+
+        .bar-fill {
+            height: 100%;
+            transition: width 0.5s ease;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 12px;
+            font-weight: bold;
+        }
+
+        .hp-bar { background: linear-gradient(90deg, #ff4444, #ff8888); }
+        .mana-bar { background: linear-gradient(90deg, #4444ff, #8888ff); }
+
+        /* Enemies (Right Side) */
+        .enemies-section {
+            flex: 2;
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+        }
+
+        .enemy-card {
+            display: flex;
+            align-items: center;
+            background: rgba(255, 255, 255, 0.15);
+            border-radius: 15px;
+            padding: 15px;
+            transition: all 0.3s;
+            border: 2px solid transparent;
+        }
+
+        .enemy-card:hover {
+            background: rgba(255, 255, 255, 0.25);
+            border-color: rgba(255,255,255,0.5);
+            transform: translateX(-5px);
+        }
+
+        .enemy-card.dead {
+            opacity: 0.3;
+            filter: grayscale(100%);
+        }
+
+        .enemy-sprite {
+            font-size: 60px;
+            min-width: 80px;
+            text-align: center;
+        }
+
+        .enemy-info {
+            flex: 1;
+            margin-left: 15px;
+        }
+
+        .enemy-name {
+            font-size: 18px;
+            font-weight: bold;
+            margin-bottom: 8px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .weakness {
+            font-size: 12px;
+            background: rgba(255,200,0,0.3);
+            padding: 2px 8px;
+            border-radius: 10px;
+            border: 1px solid rgba(255,200,0,0.5);
+        }
+
+        .enemy-hp-bar {
+            height: 20px;
+            background: rgba(0,0,0,0.3);
+            border-radius: 10px;
+            overflow: hidden;
+            border: 1px solid rgba(255,255,255,0.3);
+        }
+
+        .enemy-hp-fill {
+            height: 100%;
+            background: linear-gradient(90deg, #ff4444, #ff8888);
+            transition: width 0.5s ease;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 11px;
+            font-weight: bold;
+        }
+
+        /* Chat Interface */
+        .chat-container {
+            background: rgba(255, 255, 255, 0.95);
+            border-radius: 20px;
+            padding: 20px;
+            color: #333;
+            display: flex;
+            flex-direction: column;
+            height: 300px;
+        }
+
+        .messages {
+            flex: 1;
+            overflow-y: auto;
+            margin-bottom: 15px;
+            padding: 10px;
+            background: #f5f5f5;
+            border-radius: 10px;
+        }
+
+        .message {
+            margin-bottom: 10px;
+            padding: 10px 15px;
+            border-radius: 15px;
+            max-width: 80%;
+            width: fit-content;
+            animation: slideIn 0.3s;
+            word-wrap: break-word;
+        }
+
+        @keyframes slideIn {
+            from {
+                opacity: 0;
+                transform: translateY(10px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .user-message {
+            background: #667eea;
+            color: white;
+            margin-left: auto;
+            text-align: right;
+        }
+
+        .bot-message {
+            background: #e0e0e0;
+            color: #333;
+            margin-right: auto;
+        }
+
+        .input-container {
+            display: flex;
+            gap: 10px;
+        }
+
+        #userInput {
+            flex: 1;
+            padding: 12px 20px;
+            border: 2px solid #ddd;
+            border-radius: 25px;
+            font-size: 16px;
+            outline: none;
+            transition: border-color 0.3s;
+        }
+
+        #userInput:focus {
+            border-color: #667eea;
+        }
+
+        button {
+            padding: 12px 30px;
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            color: white;
+            border: none;
+            border-radius: 25px;
+            cursor: pointer;
+            font-size: 16px;
+            font-weight: bold;
+            transition: transform 0.2s, box-shadow 0.2s;
+        }
+
+        button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(0,0,0,0.3);
+        }
+
+        button:active {
+            transform: translateY(0);
+        }
+
+        .spell-effect {
+            position: fixed;
+            font-size: 80px;
+            pointer-events: none;
+            animation: spellCast 1s ease-out forwards;
+            z-index: 1000;
+        }
+
+        @keyframes spellCast {
+            0% {
+                opacity: 1;
+                transform: scale(0.5) translateX(0);
+            }
+            100% {
+                opacity: 0;
+                transform: scale(2) translateX(300px);
+            }
+        }
+
+        .status-effect {
+            position: absolute;
+            font-size: 40px;
+            animation: statusPop 1s ease-out forwards;
+        }
+
+        @keyframes statusPop {
+            0% {
+                opacity: 1;
+                transform: translateY(0) scale(1);
+            }
+            100% {
+                opacity: 0;
+                transform: translateY(-50px) scale(1.5);
+            }
+        }
+
+        .loading {
+            opacity: 0.6;
+            pointer-events: none;
+        }
+    </style>
+</head>
+<body>
+    <div class="game-container">
+        <h1>🧙‍♂️ Arena de Batalla de Magos ⚔️</h1>
+        
+        <div class="battle-arena">
+            <!-- Wizard Section -->
+            <div class="wizard-section">
+                <div class="wizard-sprite" id="wizardSprite">🧙‍♂️</div>
+                <div class="wizard-info">
+                    <div class="wizard-name">Tu Mago</div>
+                    <div class="stat-bar">
+                        <div class="stat-label">
+                            <span>❤️ Vida</span>
+                            <span id="wizardHpText">100/100</span>
+                        </div>
+                        <div class="bar">
+                            <div class="bar-fill hp-bar" id="wizardHp" style="width: 100%;">100%</div>
+                        </div>
+                    </div>
+                    <div class="stat-bar">
+                        <div class="stat-label">
+                            <span>✨ Maná</span>
+                            <span id="wizardManaText">50/50</span>
+                        </div>
+                        <div class="bar">
+                            <div class="bar-fill mana-bar" id="wizardMana" style="width: 100%;">100%</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Enemies Section -->
+            <div class="enemies-section" id="enemiesContainer">
+                <!-- Enemies will be dynamically added here -->
+            </div>
+        </div>
+
+        <!-- Chat Interface -->
+        <div class="chat-container">
+            <div class="messages" id="messages">
+                <div class="message bot-message">
+                    🧙 ¡Bienvenido, Mago! ¿Listo para luchar contra enemigos? Prueba "lanza bola de fuego al golem" o "revisar estado"!
+                </div>
+            </div>
+            <div class="input-container">
+                <input type="text" id="userInput" placeholder="Escribe tu comando aquí..." autocomplete="off">
+                <button onclick="sendMessage()">Enviar</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Game state
+        let             gameState = {
+            wizard: { hp: 100, maxHp: 100, mana: 50, maxMana: 50 },
+            enemies: {
+                'golem': { name: 'Golem de Piedra', hp: 80, maxHp: 80, sprite: '🗿', weakness: 'rayo', alive: true },
+                'dragon': { name: 'Dragón de Fuego', hp: 120, maxHp: 120, sprite: '🐉', weakness: 'fragmento_hielo', alive: true },
+                'zombie': { name: 'Zombi', hp: 50, maxHp: 50, sprite: '🧟', weakness: 'bola_fuego', alive: true },
+                'esqueleto': { name: 'Guerrero Esqueleto', hp: 60, maxHp: 60, sprite: '💀', weakness: null, alive: true },
+                'goblin': { name: 'Goblin', hp: 40, maxHp: 40, sprite: '👺', weakness: null, alive: true }
+            }
+        };
+
+        // Rasa server URL
+        const RASA_SERVER_URL = 'http://localhost:5005/webhooks/rest/webhook';
+        let sessionId = 'user_' + Date.now();
+
+        // Initialize enemies display
+        function initEnemies() {
+            const container = document.getElementById('enemiesContainer');
+            container.innerHTML = '';
+            
+            for (const [key, enemy] of Object.entries(gameState.enemies)) {
+                const card = createEnemyCard(key, enemy);
+                container.appendChild(card);
+            }
+        }
+
+        function createEnemyCard(key, enemy) {
+            const card = document.createElement('div');
+            card.className = 'enemy-card';
+            card.id = `enemy-${key}`;
+            
+            const hpPercent = (enemy.hp / enemy.maxHp) * 100;
+            const weaknessText = enemy.weakness ? `⚡ Débil: ${enemy.weakness}` : '';
+            
+            card.innerHTML = `
+                <div class="enemy-sprite">${enemy.sprite}</div>
+                <div class="enemy-info">
+                    <div class="enemy-name">
+                        <span>${enemy.name}</span>
+                        ${weaknessText ? `<span class="weakness">${weaknessText}</span>` : ''}
+                    </div>
+                    <div class="enemy-hp-bar">
+                        <div class="enemy-hp-fill" id="enemy-hp-${key}" style="width: ${hpPercent}%;">
+                            ${enemy.hp}/${enemy.maxHp} Vida
+                        </div>
+                    </div>
+                </div>
+            `;
+            
+            if (!enemy.alive) {
+                card.classList.add('dead');
+            }
+            
+            return card;
+        }
+
+        // Update UI based on game state
+        function updateWizardUI() {
+            const hpPercent = (gameState.wizard.hp / gameState.wizard.maxHp) * 100;
+            const manaPercent = (gameState.wizard.mana / gameState.wizard.maxMana) * 100;
+            
+            document.getElementById('wizardHp').style.width = hpPercent + '%';
+            document.getElementById('wizardHp').textContent = Math.round(hpPercent) + '%';
+            document.getElementById('wizardHpText').textContent = `${gameState.wizard.hp}/${gameState.wizard.maxHp}`;
+            
+            document.getElementById('wizardMana').style.width = manaPercent + '%';
+            document.getElementById('wizardMana').textContent = Math.round(manaPercent) + '%';
+            document.getElementById('wizardManaText').textContent = `${gameState.wizard.mana}/${gameState.wizard.maxMana}`;
+        }
+
+        function updateEnemyUI(enemyKey, hp, alive) {
+            const enemy = gameState.enemies[enemyKey];
+            if (!enemy) return;
+            
+            enemy.hp = hp;
+            enemy.alive = alive;
+            
+            const card = document.getElementById(`enemy-${enemyKey}`);
+            const hpBar = document.getElementById(`enemy-hp-${enemyKey}`);
+            
+            if (hpBar) {
+                const hpPercent = (hp / enemy.maxHp) * 100;
+                hpBar.style.width = hpPercent + '%';
+                hpBar.textContent = `${hp}/${enemy.maxHp} Vida`;
+            }
+            
+            if (!alive && card) {
+                card.classList.add('dead');
+                showStatusEffect(card, '💀');
+            }
+        }
+
+        // Parse bot message for game state updates
+        function parseGameState(text) {
+            // Parse enemy damage FIRST (before wizard HP to avoid conflicts)
+            let enemyHpParsed = false;
+            for (const [key, enemy] of Object.entries(gameState.enemies)) {
+                // Look for pattern: "Enemy takes X damage! Vida: Y/Z"
+                const damagePattern = new RegExp(enemy.name + '.*?Vida:\\s*(\\d+)\\/(\\d+)', 'i');
+                const match = text.match(damagePattern);
+                if (match) {
+                    updateEnemyUI(key, parseInt(match[1]), parseInt(match[1]) > 0);
+                    enemyHpParsed = true;
+                }
+                
+                // Check for defeated
+                if (text.includes(enemy.name) && (text.includes('derrotado') || text.includes('derrotada'))) {
+                    updateEnemyUI(key, 0, false);
+                }
+            }
+            
+            // Only parse wizard HP if no enemy HP was found in the message
+            // and the message contains "Your Status" or wizard-specific context
+            if (!enemyHpParsed || text.includes('Tu Estado') || text.includes('🧙')) {
+                const wizardHpMatch = text.match(/(?:Tu Estado|🧙)[\s\S]*?Vida:\s*(\d+)\/(\d+)/);
+                if (wizardHpMatch) {
+                    gameState.wizard.hp = parseInt(wizardHpMatch[1]);
+                    gameState.wizard.maxHp = parseInt(wizardHpMatch[2]);
+                    updateWizardUI();
+                }
+            }
+            
+            // Parse Mana (always at the end of spell messages)
+            const manaMatch = text.match(/Maná:\s*(\d+)\/(\d+)/);
+            if (manaMatch) {
+                gameState.wizard.mana = parseInt(manaMatch[1]);
+                gameState.wizard.maxMana = parseInt(manaMatch[2]);
+                updateWizardUI();
+            }
+            
+            // Parse spell effects
+            if (text.includes('🔥') || text.includes('Bola de Fuego')) {
+                showSpellEffect('🔥');
+            } else if (text.includes('⚡') || text.includes('Rayo')) {
+                showSpellEffect('⚡');
+            } else if (text.includes('❄️') || text.includes('Hielo')) {
+                showSpellEffect('❄️');
+            } else if (text.includes('✨') && (text.includes('Restauró') || text.includes('Restaurado'))) {
+                showSpellEffect('✨');
+            }
+            
+            // Reset game
+            if (text.includes('Juego reiniciado') || text.includes('juego reiniciado')) {
+                resetGameState();
+            }
+        }
+
+        function resetGameState() {
+            gameState.wizard = { hp: 100, maxHp: 100, mana: 50, maxMana: 50 };
+            gameState.enemies = {
+                'golem': { name: 'Golem de Piedra', hp: 80, maxHp: 80, sprite: '🗿', weakness: 'rayo', alive: true },
+                'dragon': { name: 'Dragón de Fuego', hp: 120, maxHp: 120, sprite: '🐉', weakness: 'fragmento_hielo', alive: true },
+                'zombie': { name: 'Zombi', hp: 50, maxHp: 50, sprite: '🧟', weakness: 'bola_fuego', alive: true },
+                'esqueleto': { name: 'Guerrero Esqueleto', hp: 60, maxHp: 60, sprite: '💀', weakness: null, alive: true },
+                'goblin': { name: 'Goblin', hp: 40, maxHp: 40, sprite: '👺', weakness: null, alive: true }
+            };
+            updateWizardUI();
+            initEnemies();
+        }
+
+        function showSpellEffect(emoji) {
+            const effect = document.createElement('div');
+            effect.className = 'spell-effect';
+            effect.textContent = emoji;
+            effect.style.left = '30%';
+            effect.style.top = '40%';
+            document.body.appendChild(effect);
+            
+            setTimeout(() => effect.remove(), 1000);
+        }
+
+        function showStatusEffect(element, emoji) {
+            const rect = element.getBoundingClientRect();
+            const effect = document.createElement('div');
+            effect.className = 'status-effect';
+            effect.textContent = emoji;
+            effect.style.left = rect.left + rect.width / 2 + 'px';
+            effect.style.top = rect.top + 'px';
+            document.body.appendChild(effect);
+            
+            setTimeout(() => effect.remove(), 1000);
+        }
+
+        // Chat functions
+        function addMessage(text, isUser) {
+            const messagesDiv = document.getElementById('messages');
+            const messageDiv = document.createElement('div');
+            messageDiv.className = `message ${isUser ? 'user-message' : 'bot-message'}`;
+            // Use innerHTML to render HTML content
+            messageDiv.innerHTML = text;
+            messagesDiv.appendChild(messageDiv);
+            messagesDiv.scrollTop = messagesDiv.scrollHeight;
+        }
+
+        function clearChat() {
+            const messagesDiv = document.getElementById('messages');
+            messagesDiv.innerHTML = '<div class="message bot-message">🧙 ¡Bienvenido, Mago! ¿Listo para luchar contra enemigos? Prueba "lanza bola de fuego al golem" o "revisar estado"!</div>';
+        }
+
+        async function sendMessage() {
+            const input = document.getElementById('userInput');
+            const message = input.value.trim();
+            
+            if (!message) return;
+            
+            addMessage(message, true);
+            input.value = '';
+            input.disabled = true;
+            document.querySelector('button').disabled = true;
+            
+            try {
+                const response = await fetch(RASA_SERVER_URL, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        sender: sessionId,
+                        message: message
+                    })
+                });
+                
+                const data = await response.json();
+                
+                if (data && data.length > 0) {
+                    data.forEach(msg => {
+                        if (msg.text) {
+                            addMessage(msg.text, false);
+                            parseGameState(msg.text);
+                            
+                            // Check if game was reset
+                            if (msg.text.includes('Juego reiniciado') || msg.text.includes('juego reiniciado')) {
+                                clearChat();
+                                // Re-add the reset message and status
+                                setTimeout(() => {
+                                    data.forEach(m => {
+                                        if (m.text) addMessage(m.text, false);
+                                    });
+                                }, 100);
+                            }
+                        }
+                    });
+                } else {
+                    addMessage('No hay respuesta del bot. ¡Asegúrate de que el servidor Rasa esté ejecutándose!', false);
+                }
+            } catch (error) {
+                console.error('Error:', error);
+                addMessage('❌ Error al conectar con el servidor Rasa. Asegúrate de que esté ejecutándose en localhost:5005', false);
+            }
+            
+            input.disabled = false;
+            document.querySelector('button').disabled = false;
+            input.focus();
+        }
+
+        // Enter key to send
+        document.getElementById('userInput').addEventListener('keypress', function(e) {
+            if (e.key === 'Enter') {
+                sendMessage();
+            }
+        });
+
+        // Initialize on load
+        window.onload = function() {
+            initEnemies();
+            updateWizardUI();
+        };
+    </script>
+</body>
+</html>
+
