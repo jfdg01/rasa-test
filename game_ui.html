@@ -481,8 +481,9 @@
             // Parse enemy damage FIRST (before wizard HP to avoid conflicts)
             let enemyHpParsed = false;
             for (const [key, enemy] of Object.entries(gameState.enemies)) {
-                // Look for pattern: "Enemy takes X damage! Vida: Y/Z"
-                const damagePattern = new RegExp(enemy.name + '.*?Vida:\\s*(\\d+)\\/(\\d+)', 'i');
+                // Look for pattern: "Enemy receives X damage! Vida: Y/Z"
+                // Must include "recibe" to avoid matching player HP in attack messages
+                const damagePattern = new RegExp(enemy.name + '.*?recibe.*?Vida:\\s*(\\d+)\\/(\\d+)', 'i');
                 const match = text.match(damagePattern);
                 if (match) {
                     updateEnemyUI(key, parseInt(match[1]), parseInt(match[1]) > 0);
@@ -495,13 +496,21 @@
                 }
             }
             
-            // Only parse wizard HP if no enemy HP was found in the message
-            // and the message contains "Your Status" or wizard-specific context
-            if (!enemyHpParsed || text.includes('Tu Estado') || text.includes('🧙')) {
-                const wizardHpMatch = text.match(/(?:Tu Estado|🧙)[\s\S]*?Vida:\s*(\d+)\/(\d+)/);
-                if (wizardHpMatch) {
-                    gameState.wizard.hp = parseInt(wizardHpMatch[1]);
-                    gameState.wizard.maxHp = parseInt(wizardHpMatch[2]);
+            // Parse wizard HP - look for "Tu Vida:" pattern
+            // This appears in attack messages like "Tu Vida: 82/100"
+            const wizardHpMatch = text.match(/Tu\s+Vida:\s*(\d+)\/(\d+)/i);
+            if (wizardHpMatch) {
+                gameState.wizard.hp = parseInt(wizardHpMatch[1]);
+                gameState.wizard.maxHp = parseInt(wizardHpMatch[2]);
+                updateWizardUI();
+            }
+            
+            // Also check for status messages with "Vida:" after "Tu Estado" or emoji
+            if (!wizardHpMatch) {
+                const statusHpMatch = text.match(/(?:Tu Estado|🧙)[\s\S]*?Vida:\s*(\d+)\/(\d+)/);
+                if (statusHpMatch) {
+                    gameState.wizard.hp = parseInt(statusHpMatch[1]);
+                    gameState.wizard.maxHp = parseInt(statusHpMatch[2]);
                     updateWizardUI();
                 }
             }

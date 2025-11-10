@@ -175,6 +175,18 @@ nlu:
     - mándale [fuego](spell_type) al [esqueleto](target)
     - otro [fuego](spell_type) al [golem](target)
     - más [rayo](spell_type) al [dragón](target)
+    - lanza una [bola](spell_type) al [esqueleto](target)
+    - [bola](spell_type) al [golem](target)
+    - usa [bola](spell_type) contra el [zombie](target)
+    - tira [bola](spell_type) al [dragon](target)
+    - dispara [bola](spell_type) al [goblin](target)
+    - lanza [bola](spell_type)
+    - ataca al [guerrero](target) con [fuego](spell_type)
+    - [rayo](spell_type) al [guerrero](target)
+    - destruye al [guerrero](target)
+    - lanza [hielo](spell_type) al [guerrero](target)
+    - usa [bola](spell_type) en el [guerrero](target)
+    - [bola](spell_type) al [guerrero](target)
 
 - intent: check_status
   examples: |

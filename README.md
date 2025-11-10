@@ -138,9 +138,10 @@ rasa test
 
 ### Rasa Pipeline
 - Language: Spanish (`es`)
+- Pre-trained Model: Spanish BERT (`dccuchile/bert-base-spanish-wwm-cased`)
 - Tokenizer: WhitespaceTokenizer
-- Featurizer: CountVectorsFeaturizer
-- Intent Classifier: DIETClassifier
+- Featurizer: LanguageModelFeaturizer (BERT) + CountVectorsFeaturizer
+- Intent Classifier: DIETClassifier (with BILOU entity tagging)
 - Entity Extractor: DIETClassifier
 - Policy: RulePolicy + TEDPolicy
 

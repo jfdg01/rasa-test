@@ -19,6 +19,45 @@ entities:
   - spell_type
   - target
 
+# Entity synonyms for better matching
+# These help the NLU understand partial names and variations
+synonyms:
+  bola_fuego:
+    - bola
+    - fuego
+    - bola de fuego
+    - bola_de_fuego
+    - fireball
+    - quemar
+  rayo:
+    - lightning
+    - electrocutar
+  fragmento_hielo:
+    - hielo
+    - fragmento
+    - fragmento de hielo
+    - fragmento_de_hielo
+    - ice
+    - ice_shard
+    - congelar
+  curar:
+    - heal
+    - cúrame
+    - curame
+  escudo:
+    - shield
+    - protégeme
+    - protegeme
+  esqueleto:
+    - guerrero
+    - guerrero esqueleto
+    - guerrero_esqueleto
+    - skeleton
+  dragon:
+    - dragón
+  zombie:
+    - zombi
+
 slots:
   spell_type:
     type: text

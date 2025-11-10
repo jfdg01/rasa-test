@@ -110,7 +110,8 @@ class WizardGame:
             "protegeme": "escudo",
             "congelar": "fragmento_hielo",
             "quemar": "bola_fuego",
-            "electrocutar": "rayo"
+            "electrocutar": "rayo",
+            "bola": "bola_fuego",  # Partial match
         }
         
         # Map target names
@@ -118,11 +119,23 @@ class WizardGame:
             "dragon": "dragon",
             "dragón": "dragon",
             "skeleton": "esqueleto",
-            "zombi": "zombie"
+            "zombi": "zombie",
+            "guerrero": "esqueleto",  # Partial match for "Guerrero Esqueleto"
+            "guerrero_esqueleto": "esqueleto",
         }
         
+        # Try direct mapping first
         spell_name = spell_mappings.get(spell_name, spell_name)
         target_name = target_mappings.get(target_name, target_name)
+        
+        # If still not found, try partial matching for targets
+        if target_name not in self.enemies:
+            for enemy_key, enemy in self.enemies.items():
+                enemy_name_lower = enemy.name.lower()
+                # Check if target_name is a substring of enemy name
+                if target_name in enemy_name_lower or enemy_key in target_name:
+                    target_name = enemy_key
+                    break
         
         # Check if spell exists
         try:
