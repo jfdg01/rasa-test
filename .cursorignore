@@ -1,0 +1,49 @@
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+*.egg
+*.egg-info/
+dist/
+build/
+*.whl
+.eggs/
+
+# Virtual Environment
+venv/
+env/
+ENV/
+
+# Rasa
+models/
+*.tar.gz
+*.db
+*.db-shm
+*.db-wal
+.rasa/
+
+# Logs
+*.log
+logs/
+rasa_command.log
+
+# Large dependencies
+node_modules/
+.venv/
+
+# Build artifacts
+dist/
+build/
+
+# Cache
+.pytest_cache/
+.mypy_cache/
+.tox/
+.coverage
+
+# OS
+.DS_Store
+Thumbs.db
+
