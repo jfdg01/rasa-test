@@ -1,0 +1,292 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <title>Rasa Core Visualisation</title>
+    <script src="https://dagrejs.github.io/project/dagre-d3/latest/dagre-d3.min.js"></script>
+    <script src="https://dagrejs.github.io/project/dagre/latest/dagre.min.js"></script>
+    <script src="https://d3js.org/d3.v4.js"></script>
+    <script src="https://dagrejs.github.io/project/graphlib-dot/v0.6.3/graphlib-dot.js"></script>
+</head>
+<body>
+<div id="errormsg" style="color: #b00"></div>
+<svg>
+    <style id="graph-style">
+        .node.invisible > rect {
+            display: none;
+        }
+
+        .node.start > rect {
+            fill: #7f7;
+            rx: 30;
+            ry: 18;
+        }
+
+        .node.end > rect {
+            fill: #f77;
+            rx: 30;
+            ry: 18;
+        }
+
+        .node:not(.active) > rect, .node:not(.active) > .label {
+            opacity: 0.4;
+        }
+
+        .edgePath:not(.active) path {
+            opacity: 0.4;
+        }
+
+        .node.ellipsis > rect {
+            fill: #CCC;
+        }
+
+        .node.intent > rect {
+            fill: #7ff;
+        }
+
+        .node.dashed > rect {
+            stroke-dasharray: 5;
+        }
+
+        text {
+            font-weight: 300;
+            font-family: "Helvetica Neue", Helvetica, Arial, sans-serf, serif;
+            font-size: 14px;
+            color: #1f1d1d;
+        }
+
+        .node rect {
+            stroke: #444;
+            fill: #fff;
+            stroke-width: 1.5px;
+        }
+
+        .edgePath path {
+            stroke: #333;
+            stroke-width: 1.5px;
+        }
+
+        svg {
+            position: fixed;
+            top: 10px;
+            left: 0;
+            height: 100%;
+            width: 100%
+        }
+    </style>
+    <g></g>
+</svg>
+<script>
+
+  function serveGraph() {
+    let oldInputGraphValue;
+
+    const url = 'visualization.dot';
+    const refreshInterval = 500;
+
+    // trigger a refresh by fetching an updated graph
+    setInterval(function () {
+      fetch(url).then(r => r.text()).then(dot => {
+        document.getElementById('errormsg').innerHTML = '';
+        if (oldInputGraphValue === dot) return;
+
+        oldInputGraphValue = dot;
+        drawGraph(dot);
+      }).catch(err => {
+        document.getElementById('errormsg').innerHTML =
+          'Failed to update plot. (' + err.message + ')';
+      });
+    }, refreshInterval);
+  }
+
+  function drawGraph(graph) {
+    let g = graphlibDot.read(graph);
+    // Set margins, if not present
+    if (!g.graph().hasOwnProperty("marginx") &&
+      !g.graph().hasOwnProperty("marginy")) {
+      g.graph().marginx = 20;
+      g.graph().marginy = 20;
+    }
+    g.graph().transition = function (selection) {
+      return selection.transition().duration(300);
+    };
+    // Render the graph into svg g
+    d3.select("svg g").call(render, g);
+  }
+  // Set up zoom support
+  const svg = d3.select("svg"),
+    inner = d3.select("svg g"),
+    zoom = d3.zoom().on("zoom", function () {
+      inner.attr("transform", d3.event.transform);
+    });
+  svg.call(zoom);
+
+  // Create and configure the renderer
+  const render = dagreD3.render();
+
+  let isClient = false;
+  isClient = true;
+
+  if (isClient) {
+    // Mark all nodes and their edges as active
+    cssRules = document.getElementById('graph-style').sheet.cssRules;
+    cssRules[3].style.opacity = 1;
+    cssRules[4].style.opacity = 1;
+
+    let graph;
+    graph = `digraph  {
+0 [class="start active", fillcolor=green, fontsize=12, label=START, style=filled];
+"-1" [class=end, fillcolor=red, fontsize=12, label=END, style=filled];
+1 [class="", fontsize=12, label=utter_greet];
+2 [class="", fontsize=12, label=utter_cheer_up];
+3 [class="", fontsize=12, label=utter_did_that_help];
+4 [class="", fontsize=12, label=utter_happy];
+8 [class="", fontsize=12, label=utter_goodbye];
+10 [class="", fontsize=12, label=action_list_spells];
+11 [class="", fontsize=12, label=action_cast_spell];
+12 [class="", fontsize=12, label=action_check_status];
+14 [class="", fontsize=12, label=action_cast_spell];
+16 [class="", fontsize=12, label=action_check_status];
+18 [class="", fontsize=12, label=action_cast_spell];
+21 [class="", fontsize=12, label=action_check_status];
+25 [class="", fontsize=12, label=action_cast_spell];
+27 [class="", fontsize=12, label=action_rest];
+30 [class="", fontsize=12, label=action_cast_spell];
+31 [class="", fontsize=12, label=action_rest];
+33 [class="", fontsize=12, label=action_cast_spell];
+34 [class="", fontsize=12, label=action_repeat_last];
+40 [class="", fontsize=12, label="..."];
+43 [class="", fontsize=12, label=utter_iamabot];
+49 [class="", fontsize=12, label=action_list_spells];
+51 [class="", fontsize=12, label=action_rest];
+55 [class="", fontsize=12, label=action_reset_game];
+56 [class=intent, fillcolor=lightblue, label="buenas noches", shape=rect, style=filled];
+57 [class=intent, fillcolor=lightblue, label="mis stats", shape=rect, style=filled];
+58 [class=intent, fillcolor=lightblue, label="hielo al goblin", shape=rect, style=filled];
+59 [class=intent, fillcolor=lightblue, label="usa el hechizo curar", shape=rect, style=filled];
+60 [class=intent, fillcolor=lightblue, label="usa hielo en el golem", shape=rect, style=filled];
+61 [class=intent, fillcolor=lightblue, label="cuáles son mis hechizos", shape=rect, style=filled];
+62 [class=intent, fillcolor=lightblue, label="estoy decepcionado", shape=rect, style=filled];
+63 [class=intent, fillcolor=lightblue, label=spells, shape=rect, style=filled];
+64 [class=intent, fillcolor=lightblue, label=status, shape=rect, style=filled];
+65 [class=intent, fillcolor=lightblue, label=maravilloso, shape=rect, style=filled];
+66 [class=intent, fillcolor=lightblue, label=ok, shape=rect, style=filled];
+67 [class=intent, fillcolor=lightblue, label="no me gusta", shape=rect, style=filled];
+68 [class=intent, fillcolor=lightblue, label="usa rayo en el dragón", shape=rect, style=filled];
+69 [class=intent, fillcolor=lightblue, label="destruir al dragón con hielo", shape=rect, style=filled];
+70 [class=intent, fillcolor=lightblue, label="lanzar bola de fuego contra goblin", shape=rect, style=filled];
+71 [class=intent, fillcolor=lightblue, label="usa el hechizo curar", shape=rect, style=filled];
+72 [class=intent, fillcolor=lightblue, label="ver mi vida", shape=rect, style=filled];
+73 [class=intent, fillcolor=lightblue, label="destruir al dragón con hielo", shape=rect, style=filled];
+74 [class=intent, fillcolor=lightblue, label="otro fuego al golem", shape=rect, style=filled];
+75 [class=intent, fillcolor=lightblue, label="hasta luego", shape=rect, style=filled];
+76 [class=intent, fillcolor=lightblue, label="hechizos disponibles", shape=rect, style=filled];
+77 [class=intent, fillcolor=lightblue, label="sin maná", shape=rect, style=filled];
+78 [class=intent, fillcolor=lightblue, label="al zombi", shape=rect, style=filled];
+79 [class=intent, fillcolor=lightblue, label="ahora al zombi", shape=rect, style=filled];
+80 [class=intent, fillcolor=lightblue, label="regenerar maná", shape=rect, style=filled];
+81 [class=intent, fillcolor=lightblue, label="mis stats", shape=rect, style=filled];
+82 [class=intent, fillcolor=lightblue, label=otra, shape=rect, style=filled];
+83 [class=intent, fillcolor=lightblue, label="una más", shape=rect, style=filled];
+84 [class=intent, fillcolor=lightblue, label="que tengas un buen día", shape=rect, style=filled];
+85 [class=intent, fillcolor=lightblue, label="estoy hablando con un bot?", shape=rect, style=filled];
+86 [class=intent, fillcolor=lightblue, label="quemar zombie", shape=rect, style=filled];
+87 [class=intent, fillcolor=lightblue, label="información del juego", shape=rect, style=filled];
+88 [class=intent, fillcolor=lightblue, label="ver magia disponible", shape=rect, style=filled];
+89 [class=intent, fillcolor=lightblue, label=recargar, shape=rect, style=filled];
+90 [class=intent, fillcolor=lightblue, label="otra vez lo mismo", shape=rect, style=filled];
+91 [class=intent, fillcolor=lightblue, label="reiniciar juego", shape=rect, style=filled];
+0 -> 40  [class="", key=NONE, label=""];
+0 -> 56  [class="", key=0];
+0 -> 57  [class="", key=0];
+0 -> 58  [class="", key=0];
+0 -> 59  [class="", key=0];
+0 -> 60  [class="", key=0];
+0 -> 61  [class="", key=0];
+1 -> 62  [class="", key=0];
+1 -> 63  [class="", key=0];
+1 -> 64  [class="", key=0];
+1 -> 65  [class="", key=0];
+2 -> 3  [class="", key=NONE, label=""];
+3 -> 66  [class="", key=0];
+3 -> 67  [class="", key=0];
+4 -> "-1"  [class="", key=NONE, label=""];
+8 -> "-1"  [class="", key=NONE, label=""];
+10 -> 68  [class="", key=0];
+10 -> 69  [class="", key=0];
+11 -> "-1"  [class="", key=NONE, label=""];
+12 -> 70  [class="", key=0];
+12 -> 71  [class="", key=0];
+14 -> 72  [class="", key=0];
+14 -> 73  [class="", key=0];
+16 -> "-1"  [class="", key=NONE, label=""];
+18 -> 74  [class="", key=0];
+18 -> 75  [class="", key=0];
+21 -> 76  [class="", key=0];
+25 -> 77  [class="", key=0];
+25 -> 78  [class="", key=0];
+27 -> 79  [class="", key=0];
+30 -> 80  [class="", key=0];
+31 -> 81  [class="", key=0];
+33 -> 82  [class="", key=0];
+34 -> "-1"  [class="", key=NONE, label=""];
+34 -> 83  [class="", key=0];
+40 -> 84  [class="", key=0];
+40 -> 85  [class="", key=0];
+40 -> 86  [class="", key=0];
+40 -> 87  [class="", key=0];
+40 -> 88  [class="", key=0];
+40 -> 89  [class="", key=0];
+40 -> 90  [class="", key=0];
+40 -> 91  [class="", key=0];
+43 -> "-1"  [class="", key=NONE, label=""];
+49 -> "-1"  [class="", key=NONE, label=""];
+51 -> "-1"  [class="", key=NONE, label=""];
+55 -> "-1"  [class="", key=NONE, label=""];
+56 -> 1  [class="", key=0];
+57 -> 12  [class="", key=0];
+58 -> 14  [class="", key=0];
+59 -> 25  [class="", key=0];
+60 -> 33  [class="", key=0];
+61 -> 10  [class="", key=0];
+62 -> 2  [class="", key=0];
+63 -> 10  [class="", key=0];
+64 -> 21  [class="", key=0];
+65 -> 4  [class="", key=0];
+66 -> 4  [class="", key=0];
+67 -> 8  [class="", key=0];
+68 -> 11  [class="", key=0];
+69 -> 18  [class="", key=0];
+70 -> 11  [class="", key=0];
+71 -> 30  [class="", key=0];
+72 -> 16  [class="", key=0];
+73 -> 14  [class="", key=0];
+74 -> 11  [class="", key=0];
+75 -> 8  [class="", key=0];
+76 -> 10  [class="", key=0];
+77 -> 27  [class="", key=0];
+78 -> 25  [class="", key=0];
+79 -> 11  [class="", key=0];
+80 -> 31  [class="", key=0];
+81 -> 16  [class="", key=0];
+82 -> 34  [class="", key=0];
+83 -> 34  [class="", key=0];
+84 -> 8  [class="", key=0];
+85 -> 43  [class="", key=0];
+86 -> 11  [class="", key=0];
+87 -> 16  [class="", key=0];
+88 -> 49  [class="", key=0];
+89 -> 51  [class="", key=0];
+90 -> 34  [class="", key=0];
+91 -> 55  [class="", key=0];
+}
+`;
+    drawGraph(graph);
+  } else {
+    serveGraph();
+  }
+
+
+</script>
+</body>
+</html>
