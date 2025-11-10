@@ -23,9 +23,10 @@
         .game-container {
             flex: 1;
             display: flex;
-            flex-direction: column;
+            flex-direction: row;
+            gap: 20px;
             padding: 20px;
-            max-width: 800px;
+            max-width: 1200px;
             margin: 0 auto;
             width: 100%;
         }
@@ -34,38 +35,53 @@
             text-align: center;
             margin-bottom: 20px;
             text-shadow: 2px 2px 4px rgba(0,0,0,0.5);
+            width: 100%;
+            max-width: 1200px;
+            margin-left: auto;
+            margin-right: auto;
+        }
+        
+        .main-wrapper {
+            display: flex;
+            flex-direction: column;
+            width: 100%;
+            max-width: 1200px;
+            margin: 0 auto;
         }
 
         .battle-arena {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            background: rgba(255, 255, 255, 0.1);
-            border-radius: 20px;
-            padding: 30px;
-            backdrop-filter: blur(10px);
-            margin-bottom: 20px;
-            min-height: 400px;
-        }
-
-        /* Wizard (Left Side) */
-        .wizard-section {
             flex: 1;
             display: flex;
             flex-direction: column;
+            justify-content: flex-start;
             align-items: center;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 20px;
+            padding: 25px;
+            backdrop-filter: blur(10px);
+            min-height: 600px;
+            max-width: 580px;
+        }
+
+        /* Wizard (Top) */
+        .wizard-section {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            margin-bottom: 30px;
+            width: 100%;
         }
 
         .wizard-sprite {
-            width: 150px;
-            height: 150px;
-            font-size: 120px;
+            width: 120px;
+            height: 120px;
+            font-size: 100px;
             display: flex;
             align-items: center;
             justify-content: center;
             background: radial-gradient(circle, rgba(255,255,255,0.2), transparent);
             border-radius: 50%;
-            margin-bottom: 20px;
+            margin-bottom: 15px;
             animation: float 3s ease-in-out infinite;
         }
 
@@ -119,20 +135,20 @@
         .hp-bar { background: linear-gradient(90deg, #ff4444, #ff8888); }
         .mana-bar { background: linear-gradient(90deg, #4444ff, #8888ff); }
 
-        /* Enemies (Right Side) */
+        /* Enemies (Bottom) */
         .enemies-section {
-            flex: 2;
             display: flex;
             flex-direction: column;
             gap: 15px;
+            width: 100%;
         }
 
         .enemy-card {
             display: flex;
             align-items: center;
             background: rgba(255, 255, 255, 0.15);
-            border-radius: 15px;
-            padding: 15px;
+            border-radius: 12px;
+            padding: 12px;
             transition: all 0.3s;
             border: 2px solid transparent;
         }
@@ -149,8 +165,8 @@
         }
 
         .enemy-sprite {
-            font-size: 60px;
-            min-width: 80px;
+            font-size: 50px;
+            min-width: 70px;
             text-align: center;
         }
 
@@ -197,13 +213,16 @@
 
         /* Chat Interface */
         .chat-container {
+            flex: 1;
             background: rgba(255, 255, 255, 0.95);
             border-radius: 20px;
             padding: 20px;
             color: #333;
             display: flex;
             flex-direction: column;
-            height: 300px;
+            min-height: 600px;
+            max-height: 600px;
+            max-width: 580px;
         }
 
         .messages {
@@ -332,10 +351,11 @@
     </style>
 </head>
 <body>
-    <div class="game-container">
+    <div class="main-wrapper">
         <h1>🧙‍♂️ Arena de Batalla de Magos ⚔️</h1>
         
-        <div class="battle-arena">
+        <div class="game-container">
+            <div class="battle-arena">
             <!-- Wizard Section -->
             <div class="wizard-section">
                 <div class="wizard-sprite" id="wizardSprite">🧙‍♂️</div>
@@ -366,10 +386,10 @@
             <div class="enemies-section" id="enemiesContainer">
                 <!-- Enemies will be dynamically added here -->
             </div>
-        </div>
+            </div>
 
-        <!-- Chat Interface -->
-        <div class="chat-container">
+            <!-- Chat Interface -->
+            <div class="chat-container">
             <div class="messages" id="messages">
                 <div class="message bot-message">
                     🧙 ¡Bienvenido, Mago! ¿Listo para luchar contra enemigos? Prueba "lanza bola de fuego al golem" o "revisar estado"!
@@ -378,6 +398,7 @@
             <div class="input-container">
                 <input type="text" id="userInput" placeholder="Escribe tu comando aquí..." autocomplete="off">
                 <button onclick="sendMessage()">Enviar</button>
+            </div>
             </div>
         </div>
     </div>
@@ -616,21 +637,20 @@
                 const data = await response.json();
                 
                 if (data && data.length > 0) {
+                    // Check if game was reset FIRST, before adding any messages
+                    const hasResetMessage = data.some(msg => 
+                        msg.text && (msg.text.includes('Juego reiniciado') || msg.text.includes('juego reiniciado'))
+                    );
+                    
+                    if (hasResetMessage) {
+                        clearChat();
+                    }
+                    
+                    // Now add all messages
                     data.forEach(msg => {
                         if (msg.text) {
                             addMessage(msg.text, false);
                             parseGameState(msg.text);
-                            
-                            // Check if game was reset
-                            if (msg.text.includes('Juego reiniciado') || msg.text.includes('juego reiniciado')) {
-                                clearChat();
-                                // Re-add the reset message and status
-                                setTimeout(() => {
-                                    data.forEach(m => {
-                                        if (m.text) addMessage(m.text, false);
-                                    });
-                                }, 100);
-                            }
                         }
                     });
                 } else {
