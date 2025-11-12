@@ -61,9 +61,11 @@ if ! kill -0 "$RASA_PID" 2>/dev/null; then
     exit 1
 fi
 
-# Start simple HTTP server for the web UI
-echo "Starting Web Server on port 8080..."
-python -m http.server 8080 &
+# Start proxy server for the web UI (also proxies to Rasa API)
+# Use Railway's PORT environment variable if available, otherwise default to 8080
+WEB_PORT=${PORT:-8080}
+echo "Starting Proxy/Web Server on port $WEB_PORT..."
+python proxy_server.py $WEB_PORT &
 WEB_PID=$!
 
 # Verify web server started
@@ -75,7 +77,7 @@ fi
 
 echo ""
 echo "✅ All services started successfully!"
-echo "   - Web UI: http://localhost:8080/game_ui.html"
+echo "   - Web UI: http://localhost:$WEB_PORT/game_ui.html"
 echo "   - Rasa API: http://localhost:5005"
 echo "   - Actions: http://localhost:5055"
 echo ""

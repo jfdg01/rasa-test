@@ -526,8 +526,19 @@
             }
         };
 
-        // Rasa server URL
-        const RASA_SERVER_URL = 'http://localhost:5005/webhooks/rest/webhook';
+        // Rasa server URL - auto-detect for Railway deployment
+        // The proxy server handles forwarding requests to Rasa, so we use the same origin
+        const getRasaServerUrl = () => {
+            const origin = window.location.origin;
+            // If running on Railway or production, use same origin (proxy handles it)
+            if (origin.includes('railway.app') || origin.includes('railway.tech') || origin.includes('up.railway.app')) {
+                // Proxy server forwards /webhooks/rest/webhook to Rasa
+                return `${origin}/webhooks/rest/webhook`;
+            }
+            // For local development, use localhost directly
+            return 'http://localhost:5005/webhooks/rest/webhook';
+        };
+        const RASA_SERVER_URL = getRasaServerUrl();
         let sessionId = 'user_' + Date.now();
 
         // Initialize enemies display

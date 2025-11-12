@@ -1,146 +1,133 @@
-# 🚀 Deployment Guide - Rasa Wizard Game
+# Railway Deployment Guide
 
-## Quick Deploy to Railway.app (Recommended)
+This guide explains how to deploy the Rasa Wizard Game to Railway.
 
-### Step 1: Prepare Your Repository
-1. Push your project to GitHub:
-   ```bash
-   git add .
-   git commit -m "Ready for deployment"
-   git push origin main
-   ```
+## Prerequisites
 
-### Step 2: Deploy to Railway
-1. Go to [railway.app](https://railway.app)
-2. Sign up/Login with GitHub
-3. Click **"New Project"**
-4. Select **"Deploy from GitHub repo"**
-5. Choose your repository
-6. Railway will automatically:
-   - Detect the Dockerfile
-   - Build the image
-   - Deploy your app
+1. A Railway account (sign up at [railway.app](https://railway.app))
+2. Your code pushed to a Git repository (GitHub, GitLab, or Bitbucket)
 
-### Step 3: Configure
-1. Go to your project settings
-2. Under **"Networking"** → **"Public Networking"**
-3. Click **"Generate Domain"**
-4. You'll get a URL like: `https://your-app.railway.app`
+## Deployment Steps
 
-### Step 4: Update Frontend
-Update the RASA_SERVER_URL in `game_ui.html`:
-```javascript
-const RASA_SERVER_URL = 'https://your-app.railway.app:5005/webhooks/rest/webhook';
-```
+### 1. Connect Your Repository
 
-### Step 5: Access Your Game
-Open: `https://your-app.railway.app:8080/game_ui.html`
+1. Go to [Railway Dashboard](https://railway.app/dashboard)
+2. Click **"New Project"**
+3. Select **"Deploy from GitHub repo"** (or your Git provider)
+4. Select your repository containing this project
+5. Railway will automatically detect the `Dockerfile` and start building
 
----
+### 2. Configure Ports
 
-## Alternative: Deploy to Render.com
+Railway will automatically:
+- Detect the Dockerfile
+- Build the Docker image
+- Expose port 8080 (or the PORT environment variable) as the public service
 
-### Step 1: Prepare Repository
-Same as Railway (push to GitHub)
+**No additional configuration needed!** The proxy server automatically handles forwarding Rasa API requests, so you only need one public port.
 
-### Step 2: Deploy to Render
-1. Go to [render.com](https://render.com)
-2. Sign up/Login
-3. Click **"New +"** → **"Web Service"**
-4. Connect your GitHub repository
-5. Render will detect the `render.yaml` file
-6. Click **"Create Web Service"**
+### 3. Environment Variables (Optional)
 
-### Step 3: Access
-Your app will be at: `https://your-app.onrender.com`
+Railway will automatically set the `PORT` environment variable. The startup script will use it.
 
----
+No additional environment variables are required for basic deployment.
 
-## Important Notes
+### 4. Deploy
 
-### Training the Model
-Before deploying, train your Rasa model locally:
-```bash
-rasa train
-```
+Railway will automatically:
+- Build your Docker image
+- Deploy it
+- Provide you with a public URL
 
-This creates a model in the `models/` folder that will be included in the deployment.
+### 5. Access Your Application
 
-### Environment Variables (Optional)
-You can set these in Railway/Render dashboard:
-- `RASA_TELEMETRY_ENABLED=false` - Disable telemetry
-- `PORT=8080` - Web server port
+Once deployed, Railway will provide you with a public URL like:
+- `https://your-app-name.up.railway.app`
 
-### Free Tier Limitations
-- **Railway**: $5 credit/month (~500 hours)
-- **Render**: 750 hours/month (sleeps after 15 min inactivity)
+Access your game at:
+- `https://your-app-name.up.railway.app/game_ui.html`
 
-### Keeping the App Awake (Render)
-Render's free tier sleeps after inactivity. Options:
-1. Use a service like [UptimeRobot](https://uptimerobot.com) to ping your app
-2. Upgrade to paid tier
-3. Accept the sleep behavior
+## Configuration Details
 
----
+### Port Configuration
 
-## Testing Locally with Docker
+- **Port 8080** (or `$PORT`): Web UI (public)
+- **Port 5005**: Rasa API server (internal, can be made public)
+- **Port 5055**: Rasa Action Server (internal)
 
-Before deploying, test the Docker setup:
+### How It Works
 
-```bash
-# Build the image
-docker build -t rasa-game .
+1. The `start.sh` script starts all three services:
+   - Rasa Action Server on port 5055 (internal)
+   - Rasa Server on port 5005 (internal)
+   - Proxy/Web Server on port 8080 (or Railway's PORT) - **public**
 
-# Run the container
-docker run -p 8080:8080 -p 5005:5005 -p 5055:5055 rasa-game
+2. The proxy server (`proxy_server.py`) serves static files (HTML, CSS, JS) and forwards API requests to the Rasa server on port 5005.
 
-# Access at http://localhost:8080/game_ui.html
-```
+3. The HTML file (`game_ui.html`) automatically detects if it's running on Railway and uses the same origin for all requests (the proxy handles routing).
 
----
+4. All services run in the same container, so they can communicate via `localhost`.
 
 ## Troubleshooting
 
-### Issue: Rasa server not starting
-- Check logs in Railway/Render dashboard
-- Ensure model is trained (`rasa train`)
-- Verify `requirements.txt` has all dependencies
+### Issue: Rasa API not accessible
+
+**Solution**: The proxy server should handle this automatically. Check Railway logs to ensure the proxy server is running. If issues persist, verify that the proxy server is forwarding requests correctly.
+
+### Issue: Build fails
+
+**Solution**: 
+- Check Railway build logs
+- Ensure all files are committed to Git
+- Verify the Dockerfile is correct
+
+### Issue: Services not starting
+
+**Solution**:
+- Check Railway logs: `railway logs`
+- Verify the model file is in the `models/` directory
+- Check that all dependencies are in `requirements.txt`
 
 ### Issue: CORS errors
-- Rasa is configured with `--cors "*"` in Dockerfile
-- If issues persist, check browser console for specific errors
 
-### Issue: Actions server not responding
-- Ensure `endpoints.yml` points to correct action server URL
-- Check if port 5055 is accessible
+**Solution**: The Rasa server is configured with `--cors "*"` which should allow all origins. If issues persist, check Railway logs.
 
----
+## Railway CLI (Optional)
 
-## Cost Estimate
+You can also deploy using Railway CLI:
 
-### Railway.app (Recommended for this project)
-- **Free tier**: $5 credit/month
-- **Usage**: ~$0.01/hour running
+```bash
+# Install Railway CLI
+npm i -g @railway/cli
+
+# Login
+railway login
+
+# Initialize project
+railway init
+
+# Deploy
+railway up
+```
+
+## Cost
+
+Railway offers:
+- **Free tier**: $5 credit/month (~500 hours of runtime)
+- **Usage**: ~$0.01/hour
 - **Estimate**: Can run ~500 hours/month free
-- **Paid**: $5/month for 100+ hours
 
-### Render.com
-- **Free tier**: 750 hours/month
-- **Limitation**: Sleeps after 15 min inactivity
-- **Paid**: $7/month for always-on
+## Monitoring
 
----
+- View logs: Railway Dashboard → Your Service → Logs
+- Monitor usage: Railway Dashboard → Usage
+- Check health: Railway Dashboard → Metrics
 
 ## Next Steps
 
-1. ✅ Push code to GitHub
-2. ✅ Sign up for Railway or Render
-3. ✅ Deploy from repository
-4. ✅ Get your public URL
-5. ✅ Update `game_ui.html` with your URL
-6. ✅ Play your game online! 🎮
+1. ✅ Deploy to Railway
+2. ✅ Get your public URL
+3. ✅ Test the game at `https://your-url.up.railway.app/game_ui.html`
+4. ✅ Share your game with others!
 
-Need help? Check the platform's documentation:
-- [Railway Docs](https://docs.railway.app)
-- [Render Docs](https://render.com/docs)
-
+For more information, see [Railway Documentation](https://docs.railway.app).

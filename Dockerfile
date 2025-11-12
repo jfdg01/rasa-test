@@ -23,8 +23,8 @@ COPY . .
 # The model is pre-trained and located in models/ directory
 # Rasa will automatically use the latest model from models/ when starting
 
-# Ensure startup script is executable
-RUN chmod +x /app/start.sh
+# Ensure startup script and proxy server are executable
+RUN chmod +x /app/start.sh && chmod +x /app/proxy_server.py
 
 # Expose ports
 # 5005 for Rasa server
