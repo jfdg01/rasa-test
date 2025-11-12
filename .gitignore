@@ -29,8 +29,6 @@ env.bak/
 venv.bak/
 
 # Rasa
-models/
-*.tar.gz
 *.db
 *.db-shm
 *.db-wal

@@ -9,7 +9,6 @@ env/
 ENV/
 
 # Rasa
-models/*.tar.gz
 .rasa/
 
 # Git

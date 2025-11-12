@@ -1,5 +1,5 @@
-# Use Python 3.9 as base image
-FROM python:3.9-slim
+# Use Python 3.10.11 as base image
+FROM python:3.10.11-slim
 
 # Set working directory
 WORKDIR /app
@@ -7,6 +7,8 @@ WORKDIR /app
 # Install system dependencies
 RUN apt-get update && apt-get install -y \
     build-essential \
+    bash \
+    curl \
     && rm -rf /var/lib/apt/lists/*
 
 # Copy requirements first for better caching
@@ -18,30 +20,23 @@ RUN pip install --no-cache-dir -r requirements.txt
 # Copy all project files
 COPY . .
 
-# Train the Rasa model (optional - comment out if model is pre-trained)
-# RUN rasa train --fixed-model-name game_model
+# The model is pre-trained and located in models/ directory
+# Rasa will automatically use the latest model from models/ when starting
+
+# Ensure startup script is executable
+RUN chmod +x /app/start.sh
 
 # Expose ports
 # 5005 for Rasa server
-# 5055 for Rasa actions server
+# 5055 for Rasa actions server  
 # 8080 for web UI
 EXPOSE 5005 5055 8080
 
-# Create startup script
-RUN echo '#!/bin/bash\n\
-echo "Starting Rasa Action Server..."\n\
-rasa run actions --port 5055 &\n\
-\n\
-echo "Waiting for action server to start..."\n\
-sleep 5\n\
-\n\
-echo "Starting Rasa Server..."\n\
-rasa run --enable-api --cors "*" --port 5005 &\n\
-\n\
-echo "Starting Web Server..."\n\
-python -m http.server 8080\n\
-' > /app/start.sh && chmod +x /app/start.sh
+# Health check to verify services are running
+HEALTHCHECK --interval=30s --timeout=10s --start-period=40s --retries=3 \
+    CMD curl -f http://localhost:5005/status || exit 1
 
-# Start all services
-CMD ["/app/start.sh"]
+# Use exec form for proper signal handling
+# This ensures signals are properly forwarded to the script
+CMD ["/bin/bash", "/app/start.sh"]
 

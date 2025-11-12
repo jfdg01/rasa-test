@@ -12,7 +12,10 @@ import sys
 import os
 
 # Add the parent directory to the path so we can import game_engine
-sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
+# This ensures game_engine can be imported regardless of where the script is run from
+parent_dir = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+if parent_dir not in sys.path:
+    sys.path.insert(0, parent_dir)
 
 from game_engine import cast_spell, get_game_status, list_spells, rest, reset_game
 
