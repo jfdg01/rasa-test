@@ -1,5 +1,6 @@
 #!/bin/bash
-set -euo pipefail
+set -eu
+set -o pipefail
 
 # Startup script for Rasa Wizard Game
 echo "🧙 Starting Rasa Wizard Game..."

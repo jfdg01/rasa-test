@@ -530,13 +530,9 @@
         // The proxy server handles forwarding requests to Rasa, so we use the same origin
         const getRasaServerUrl = () => {
             const origin = window.location.origin;
-            // If running on Railway or production, use same origin (proxy handles it)
-            if (origin.includes('railway.app') || origin.includes('railway.tech') || origin.includes('up.railway.app')) {
-                // Proxy server forwards /webhooks/rest/webhook to Rasa
-                return `${origin}/webhooks/rest/webhook`;
-            }
-            // For local development, use localhost directly
-            return 'http://localhost:5005/webhooks/rest/webhook';
+            // Always use the proxy server (it handles forwarding to Rasa)
+            // This works for both local development (port 8080) and production (Railway)
+            return `${origin}/webhooks/rest/webhook`;
         };
         const RASA_SERVER_URL = getRasaServerUrl();
         let sessionId = 'user_' + Date.now();

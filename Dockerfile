@@ -23,8 +23,11 @@ COPY . .
 # The model is pre-trained and located in models/ directory
 # Rasa will automatically use the latest model from models/ when starting
 
-# Ensure startup script and proxy server are executable
-RUN chmod +x /app/start.sh && chmod +x /app/proxy_server.py
+# Convert Windows line endings to Unix (CRLF to LF) and make scripts executable
+RUN sed -i 's/\r$//' /app/start.sh && \
+    sed -i 's/\r$//' /app/proxy_server.py && \
+    chmod +x /app/start.sh && \
+    chmod +x /app/proxy_server.py
 
 # Expose ports
 # 5005 for Rasa server
@@ -39,4 +42,3 @@ HEALTHCHECK --interval=30s --timeout=10s --start-period=40s --retries=3 \
 # Use exec form for proper signal handling
 # This ensures signals are properly forwarded to the script
 CMD ["/bin/bash", "/app/start.sh"]
-
